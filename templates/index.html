@@ -1,0 +1,13 @@
+<!doctype html>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="static/script.js"></script>
+
+<title>Hello from Flask</title>
+{% if name %}
+  <h1>Hello {{ name }}!</h1>
+{% else %}
+  <h1>Добавьте данные в бд</h1>
+{% endif %}
+  <div id="tmpButton"
+       style="border-style: dashed; padding: 5px 10px 5px 10px; margin: auto; width: fit-content;"
+       onclick="addData()"><h3>Добавить данные в БД</h3></div>
