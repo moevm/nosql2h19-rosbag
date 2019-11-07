@@ -1,3 +1,5 @@
 .DS_Store
 testMongo.py
 nosql.txt
+.vscode/
+bags/
