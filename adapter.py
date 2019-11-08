@@ -4,14 +4,38 @@ import csv
 from operator import itemgetter
 import json
 
+__all__ = ["getDataFromBag"]
+
+def getDataFromBag(bag_path):
+    bag = rosbag.Bag(bag_path)
+    bag.close()
+    
+    data = []
+    for key, value in bag.get_type_and_topic_info()[1].items():
+        storage = {}
+        storage["topic_name"] = key
+        storage["msgs_num"] = value[1]
+        storage["msgs_type"] = value[0]
+        storage["msgs_list"] = []
+        try:
+            lines = rosmsg.get_msg_text(value[0]).splitlines()
+            msgTypes, msgNames = makeTypes(lines)
+        except rosmsg.ROSMsgException:
+            print 'UNKNOWN TYPE OS MSG'
+        
+        for i in range(len(msgNames)):
+            storage["msgs_list"].append({"msg_name" : msgNames[i], "msg_type" : msgTypes[i], "msgs" : []})
+
+        data.append(storage)
+    return data
+
 def makeTypes(lines):
     types = []
     names = []
-    real_names = []
 
     for line in lines:
-        curSpaces = len(line) - len(line.lstrip())
         newLine = line.lstrip()
+        curSpaces = len(line) - len(newLine)
         type, name = newLine.split()
         types.append([curSpaces, type, True])
         names.append([curSpaces, name, True])
@@ -22,7 +46,7 @@ def makeTypes(lines):
     types = mergeLines(types)
     types = [elem[1] for elem in types if elem[2]]
 
-    return (types, names, real_names)
+    return (types, names)
 
 def mergeLines(lines):
     minIndent = min(lines, key=itemgetter(0))[0]
@@ -53,38 +77,11 @@ def mergeLines(lines):
         
 
 
-def getBagData(bag):
-    data = []
-    for key, value in bag.get_type_and_topic_info()[1].items():
-        storage = {}
-        storage["topic_name"] = key
-        storage["msgs_num"] = value[1]
-        storage["msgs_type"] = value[0]
-        storage["msgs_list"] = []
-        try:
-            lines = rosmsg.get_msg_text(value[0]).splitlines()
-            msgTypes, msgNames, real_names = makeTypes(lines)
-            for type in msgTypes:
-                print type
-            for name in msgNames:
-                print name
-        except rosmsg.ROSMsgException:
-            print 'UNKNOWN'
-        
-        for i in range(len(msgNames)):
-            storage["msgs_list"].append({"msg_name" : msgNames[i], "msg_type" : msgTypes[i], "msgs" : []})
-        # for topic, msg, t in bag.read_messages(topics=[key]):
-        #     print str(msg)
-        #     break
-
-        data.append(storage)
-    return data
-
-# bag = rosbag.Bag('bags/2011-01-24-06-18-27.bag')
-bag = rosbag.Bag('bags/Double.bag')
-data = getBagData(bag)
-print json.dumps(data, indent=2)
-bag.close()
+if __name__ == "__main__":
+    # bagName = 'bags/2011-01-24-06-18-27.bag')
+    bagName = 'bags/Double.bag'
+    data = getDataFromBag(bagName)
+    print json.dumps(data, indent=2)
 
 # csv_path = "bags/square/_slash_turtle1_slash_cmd_vel.csv"
 # with open(csv_path, "r") as f_obj:

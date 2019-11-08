@@ -1,8 +1,11 @@
 from flask import Flask, render_template, jsonify, make_response
 from pymongo import MongoClient
+from adapter import getDataFromBag
 
 client = MongoClient()
 app = Flask(__name__)
+
+# print(getDataFromBag('bags/Double.bag'))
 
 @app.route("/")
 def hello(name=None):
