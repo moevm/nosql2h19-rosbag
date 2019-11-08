@@ -81,7 +81,7 @@ def getBagData(bag):
     return data
 
 # bag = rosbag.Bag('bags/2011-01-24-06-18-27.bag')
-bag = rosbag.Bag('bags/square.bag')
+bag = rosbag.Bag('bags/Double.bag')
 data = getBagData(bag)
 print json.dumps(data, indent=2)
 bag.close()
