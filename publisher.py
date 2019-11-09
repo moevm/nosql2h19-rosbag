@@ -8,7 +8,7 @@ def talker():
     pub2 = rospy.Publisher('quaternionTopic', Quaternion, queue_size=10)
     rospy.init_node('talker', anonymous=True)
     rate = rospy.Rate(5) # 10hz
-    for i in range(40):
+    for i in range(5):
         msg = Pose()
         msg.position.x = 1.1
         msg.position.y = 2.2

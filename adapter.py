@@ -1,16 +1,24 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
 import rosbag
 import rosmsg
-import csv
 from operator import itemgetter
 import json
+import string
 
 __all__ = ["getDataFromBag"]
 
 def getDataFromBag(bag_path):
     bag = rosbag.Bag(bag_path)
+    structure = getBagStructureWithoutMsgs(bag)
+    msgsWithTopics = getMsgsWithTopic(bagName)
     bag.close()
-    
-    data = []
+
+    mergeStructureAndMsgs(structure, msgsWithTopics)
+    return structure
+
+
+def getBagStructureWithoutMsgs(bag):
     for key, value in bag.get_type_and_topic_info()[1].items():
         storage = {}
         storage["topic_name"] = key
@@ -25,9 +33,7 @@ def getDataFromBag(bag_path):
         
         for i in range(len(msgNames)):
             storage["msgs_list"].append({"msg_name" : msgNames[i], "msg_type" : msgTypes[i], "msgs" : []})
-
-        data.append(storage)
-    return data
+    return storage
 
 def makeTypes(lines):
     types = []
@@ -74,22 +80,91 @@ def mergeLines(lines):
 
     return lines
 
-        
+def getMsgsWithTopic(bagFileName):
+    #access bag
+    bag = rosbag.Bag(bagFileName)
+    bagContents = bag.read_messages()
 
+    #get list of topics from the bag
+    listOfTopics = []
+    msgaOfTopics = {}
+    for topic, msg, t in bagContents:
+        if topic not in listOfTopics:
+            listOfTopics.append(topic)
+
+    for topicName in listOfTopics:
+        msgaOfTopics[topicName] = []
+        firstIteration = True	#allows header row
+        for subtopic, msg, t in bag.read_messages(topicName):	# for each instant in time that has data for topicName
+            #parse data from this instant, which is of the form of multiple lines of "Name: value\n"
+            #	- put it in the form of a list of 2-element lists
+            msgString = str(msg)
+            msgList = string.split(msgString, '\n')
+            instantaneousListOfData = []
+            for nameValuePair in msgList:
+                splitPair = string.split(nameValuePair, ':')
+                for i in range(len(splitPair)):	#should be 0 to 1
+                    splitPair[i] = string.strip(splitPair[i])
+                instantaneousListOfData.append(splitPair)
+            #write the first row from the first element of each pair
+            if firstIteration:	# header
+                headers = ["rosbagTimestamp"]	#first column header
+                for pair in instantaneousListOfData:
+                    headers.append(pair[0])
+                msgaOfTopics[topicName].append(headers)
+                firstIteration = False
+            # write the value from each pair to the file
+            values = [str(t)]	#first column will have rosbag timestamp
+            for pair in instantaneousListOfData:
+                if len(pair) > 1:
+                    values.append(pair[1])
+            msgaOfTopics[topicName].append(values)
+    return msgaOfTopics
+
+def mergeStructureAndMsgs(structure, msgsWithTopics):
+    for msgsList in msgsWithTopics.values():
+        names = msgsList[0]
+        names = names[1:] # убираем TimeStomp
+
+        msgsInColumns = []
+        for row in msgsList[1:]: # убираем TimeStomp
+            content = list(row[i] for i in range(1, len(names)+1))
+            msgsInColumns.append(content)
+
+        prev = 0
+        fullMsgsList = []
+        stack = []
+        columnNumbersOfMsg = []
+        index = 0
+
+        for name in names:
+            if msgsInColumns[0][index] == '':
+                if prev == 0: # если предыдуший тоже пустой
+                    stack.append(name)
+                if prev == 1: # если пред не пустой
+                    stack.pop()
+                    stack.append(name)
+                prev = 0
+            else: # если столбец не пустой
+                res = '/'.join(stack + [name])
+                fullMsgsList.append(res)
+                prev = 1
+                columnNumbersOfMsg.append(index)
+            index += 1
+
+    for msgDict in structure["msgs_list"]:
+        msgNumber = 0
+        for msgName in fullMsgsList:
+            if msgName == msgDict["msg_name"]:
+                print msgName, "==", msgDict["msg_name"]
+                for row in msgsInColumns:
+                    msgDict["msgs"].append(row[columnNumbersOfMsg[msgNumber]])
+                break
+            msgNumber += 1
 
 if __name__ == "__main__":
     # bagName = 'bags/2011-01-24-06-18-27.bag')
     bagName = 'bags/Double.bag'
-    data = getDataFromBag(bagName)
-    print json.dumps(data, indent=2)
-
-# csv_path = "bags/square/_slash_turtle1_slash_cmd_vel.csv"
-# with open(csv_path, "r") as f_obj:
-#     reader = csv.reader(f_obj)
-#     names = reader.next()
-#     print names
-
+    structure = getDataFromBag(bagName)
+    print json.dumps(structure, indent=2)
     
-#     for row in reader:
-#         content = list(row[i] for i in [1,2])
-#         print content
