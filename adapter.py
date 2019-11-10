@@ -19,6 +19,7 @@ def getDataFromBag(bag_path):
 
 
 def getBagStructureWithoutMsgs(bag):
+    data = []
     for key, value in bag.get_type_and_topic_info()[1].items():
         storage = {}
         storage["topic_name"] = key
@@ -33,7 +34,8 @@ def getBagStructureWithoutMsgs(bag):
         
         for i in range(len(msgNames)):
             storage["msgs_list"].append({"msg_name" : msgNames[i], "msg_type" : msgTypes[i], "msgs" : []})
-    return storage
+        data.append(storage)
+    return data
 
 def makeTypes(lines):
     types = []
@@ -122,7 +124,7 @@ def getMsgsWithTopic(bagFileName):
     return msgaOfTopics
 
 def mergeStructureAndMsgs(structure, msgsWithTopics):
-    for msgsList in msgsWithTopics.values():
+    for topicName, msgsList in msgsWithTopics.items():
         names = msgsList[0]
         names = names[1:] # убираем TimeStomp
 
@@ -151,16 +153,17 @@ def mergeStructureAndMsgs(structure, msgsWithTopics):
                 prev = 1
                 columnNumbersOfMsg.append(index)
             index += 1
-
-    for msgDict in structure["msgs_list"]:
-        msgNumber = 0
-        for msgName in fullMsgsList:
-            if msgName == msgDict["msg_name"]:
-                print msgName, "==", msgDict["msg_name"]
-                for row in msgsInColumns:
-                    msgDict["msgs"].append(row[columnNumbersOfMsg[msgNumber]])
-                break
-            msgNumber += 1
+        
+        for topic_record in structure:
+            if topic_record["topic_name"] == topicName:
+                for msgDict in topic_record["msgs_list"]:
+                    msgNumber = 0
+                    for msgName in fullMsgsList:
+                        if msgName == msgDict["msg_name"]:
+                            for row in msgsInColumns:
+                                msgDict["msgs"].append(row[columnNumbersOfMsg[msgNumber]])
+                            break
+                        msgNumber += 1
 
 if __name__ == "__main__":
     # bagName = 'bags/2011-01-24-06-18-27.bag')
