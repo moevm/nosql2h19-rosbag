@@ -5,6 +5,7 @@ import rosmsg
 from operator import itemgetter
 import json
 import string
+from datetime import datetime
 
 __all__ = ["getDataFromBag"]
 
@@ -19,8 +20,12 @@ def getDataFromBag(bag_path):
 
 
 def getBagStructureWithoutMsgs(bag):
-    data = []
-    for key, value in bag.get_type_and_topic_info()[1].items():
+    bagfile = {}
+    bagfile["filename"] = bag.filename
+    bagfile["date_creation"] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+    bagfile["duration"] = bag.get_end_time() - bag.get_start_time()
+    bagfile["topics_list"] = []
+    for key, value in bag.get_type_and_topic_info()[1].items():    
         storage = {}
         storage["topic_name"] = key
         storage["msgs_num"] = value[1]
@@ -34,8 +39,8 @@ def getBagStructureWithoutMsgs(bag):
         
         for i in range(len(msgNames)):
             storage["msgs_list"].append({"msg_name" : msgNames[i], "msg_type" : msgTypes[i], "msgs" : []})
-        data.append(storage)
-    return data
+        bagfile["topics_list"].append(storage)
+    return bagfile
 
 def makeTypes(lines):
     types = []
@@ -123,7 +128,7 @@ def getMsgsWithTopic(bagFileName):
             msgaOfTopics[topicName].append(values)
     return msgaOfTopics
 
-def mergeStructureAndMsgs(structure, msgsWithTopics):
+def mergeStructureAndMsgs(bagfile, msgsWithTopics):
     for topicName, msgsList in msgsWithTopics.items():
         names = msgsList[0]
         names = names[1:] # убираем TimeStomp
@@ -154,7 +159,7 @@ def mergeStructureAndMsgs(structure, msgsWithTopics):
                 columnNumbersOfMsg.append(index)
             index += 1
         
-        for topic_record in structure:
+        for topic_record in bagfile["topics_list"]:
             if topic_record["topic_name"] == topicName:
                 for msgDict in topic_record["msgs_list"]:
                     msgNumber = 0
@@ -170,4 +175,5 @@ if __name__ == "__main__":
     bagName = 'bags/Double.bag'
     structure = getDataFromBag(bagName)
     print json.dumps(structure, indent=2)
+    print structure.keys()
     
