@@ -12,7 +12,7 @@ __all__ = ["getDataFromBag"]
 def getDataFromBag(bag_path):
     bag = rosbag.Bag(bag_path)
     structure = getBagStructureWithoutMsgs(bag)
-    msgsWithTopics = getMsgsWithTopic(bagName)
+    msgsWithTopics = getMsgsWithTopic(bag)
     bag.close()
 
     mergeStructureAndMsgs(structure, msgsWithTopics)
@@ -87,9 +87,7 @@ def mergeLines(lines):
 
     return lines
 
-def getMsgsWithTopic(bagFileName):
-    #access bag
-    bag = rosbag.Bag(bagFileName)
+def getMsgsWithTopic(bag):
     bagContents = bag.read_messages()
 
     #get list of topics from the bag
@@ -176,4 +174,3 @@ if __name__ == "__main__":
     structure = getDataFromBag(bagName)
     print json.dumps(structure, indent=2)
     print structure.keys()
-    

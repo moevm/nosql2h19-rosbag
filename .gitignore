@@ -3,4 +3,4 @@ testMongo.py
 nosql.txt
 .vscode/
 bags/
-.pyc
+*.pyc
