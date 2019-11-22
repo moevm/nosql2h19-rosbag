@@ -3,7 +3,11 @@
 from pymongo import MongoClient
 
 
-class dbQueryManager:
+class dbQueryManager(object):
+    def __new__(self):
+        if not hasattr(self, 'instance'):
+            self.instance = super(dbQueryManager, self).__new__(self)
+        return self.instance
     '''
     В конструктор передаётся название коллекции и базы данных (опционально).
     '''
