@@ -7,6 +7,7 @@ import json
 import string
 from datetime import datetime
 import os
+from pprint import pprint
 
 __all__ = ["getDataFromBag"]
 
@@ -24,7 +25,7 @@ def getBagStructureWithoutMsgs(bag):
     bagfile = {}
     _, tail = os.path.split(bag.filename)
     bagfile["filename"] = tail
-    bagfile["date_creation"] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+    bagfile["date_creation"] = datetime.fromtimestamp(bag.get_start_time())
     bagfile["duration"] = bag.get_end_time() - bag.get_start_time()
     bagfile["topics_list"] = []
     for key, value in bag.get_type_and_topic_info()[1].items():    
@@ -102,7 +103,7 @@ def getMsgsWithTopic(bag):
     for topicName in listOfTopics:
         msgaOfTopics[topicName] = []
         firstIteration = True	#allows header row
-        for subtopic, msg, t in bag.read_messages(topicName):	# for each instant in time that has data for topicName
+        for _, msg, t in bag.read_messages(topicName):	# for each instant in time that has data for topicName
             #parse data from this instant, which is of the form of multiple lines of "Name: value\n"
             #	- put it in the form of a list of 2-element lists
             msgString = str(msg)
@@ -174,5 +175,14 @@ if __name__ == "__main__":
     # bagName = 'bags/2011-01-24-06-18-27.bag')
     bagName = 'bags/Double.bag'
     structure = getDataFromBag(bagName)
-    print json.dumps(structure, indent=2)
-    print structure.keys()
+    # print json.dumps(structure, indent=2)
+    pprint(structure)
+
+    from pymongo import MongoClient
+    client = MongoClient()
+    db = client["test_database"]
+
+    newDocument = getDataFromBag('bags/hello.bag')
+    bags = db.bagfiles_test
+    post_id = bags.insert_one(newDocument).inserted_id
+    print(post_id)
