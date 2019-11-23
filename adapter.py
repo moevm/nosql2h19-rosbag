@@ -6,6 +6,7 @@ from operator import itemgetter
 import json
 import string
 from datetime import datetime
+import os
 
 __all__ = ["getDataFromBag"]
 
@@ -21,7 +22,8 @@ def getDataFromBag(bag_path):
 
 def getBagStructureWithoutMsgs(bag):
     bagfile = {}
-    bagfile["filename"] = bag.filename
+    _, tail = os.path.split(bag.filename)
+    bagfile["filename"] = tail
     bagfile["date_creation"] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
     bagfile["duration"] = bag.get_end_time() - bag.get_start_time()
     bagfile["topics_list"] = []
