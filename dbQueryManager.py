@@ -6,7 +6,7 @@ from pprint import pprint
 
 
 class dbQueryManager(object):
-    def __new__(self):
+    def __new__(self, db_name="test_database"):
         if not hasattr(self, 'instance'):
             self.instance = super(dbQueryManager, self).__new__(self)
         return self.instance
@@ -42,6 +42,92 @@ class dbQueryManager(object):
         )
         return dbQueryManager.__cursorToMap(resultCursor)
 
+    def getBagsByTopics(self, collection_name, topics):
+        collection = self.db[collection_name]
+        resultCursor = collection.aggregate([
+            {
+                "$match": {
+                    "topics_list.topic_name": {
+                        "$in": topics
+                    }
+                }
+            }
+        ])
+        return dbQueryManager.__cursorToMap(resultCursor)
+
+    def getBagsByDateDistance(self, collection_name, date, direction):
+        if direction == "more":
+            cmper = "$gte"
+        else:
+            cmper = "$lte"
+        collection = self.db[collection_name]
+        resultCursor = collection.find({
+            "date_creation": {
+                cmper: date
+            }
+        })
+        return dbQueryManager.__cursorToMap(resultCursor)
+
+    def getBagsByMsgsNumber(self, collection_name, min_num, max_num):
+        # collection = self.db[collection_name]
+        # resultCursor = collection.aggregate([
+        #     {
+        #         "$match": {
+        #             "topics_list.msgs_num": {
+        #                 "$gte": min_num,
+        #                 "$lte": max_num
+        #             }
+        #         }
+        #     }
+        # ])
+        # return dbQueryManager.__cursorToMap(resultCursor)
+
+        collection = self.db[collection_name]
+        all = collection.aggregate([
+            {
+                "$group": {
+                    "_id": "None",
+                    "msgsInTopics": {
+                        "$push": {
+                            "objId": "$_id",
+                            "msgsInTopic": "$topics_list.msgs_num"
+                        }
+                    }
+                }
+            }
+        ])
+        res = dbQueryManager.__cursorToMap(all)["None"]["msgsInTopics"]
+        res = [x["objId"] for x in res if sum(x['msgsInTopic']) > min_num and  sum(x['msgsInTopic']) < max_num]
+
+        ans = collection.find({
+            "_id": {"$in": res}
+        })
+
+        # for kek in ans:
+        #     pprint(kek["filename"])
+        return dbQueryManager.__cursorToMap(ans)
+
+    def getNumberOfMsgs(self, collection_name):
+        pass
+        # resultCursor = collection.aggregate([
+        #     {
+        #         "$project": {
+        #             "msgs": {
+        #                 "$map": {
+        #                     "input": "topics_list",
+        #                     "as": "topicMsgs",
+        #                     "in": {
+        #                         "$add": 
+        #                     }
+        #                 }
+        #             }
+        #         }
+        #     }
+        # ]
+            
+        # )
+        # return dbQueryManager.__cursorToMap(resultCursor)
+        # return list(resultCursor)
 
     @staticmethod
     def __cursorToMap(iterableOfMaps):
@@ -60,10 +146,20 @@ if __name__ == "__main__":
     manager.getNumberOfDocuments(collection)
     manager.getDocumentNames(collection)
     
-    listOfBags = manager.getMainInfo(collection)
-    print(listOfBags)
+    # lel = manager.getMainInfo(collection)
+    # lel = manager.getBagsByTopics(collection, ["quaternionTopic", "poseTopic"])
+    # lel = manager.getBagsByTopics(collection, ["/chatter"])
+    # lel = manager.getBagsByMsgsNumber(collection, 9, 1000)
+    date = datetime.datetime(2019, 12, 1, 0,0,0,0)
+    lel = manager.getBagsByDateDistance(collection, date, "more")
+
+    
+    # print(manager.getNumberOfMsgs(collection))
     # kek = manager.getSortedBy(collection, "date_creation")
     # kek = [elem["_id"] for elem in kek]
     # print(kek)
+
+    for bag in lel.values():
+        print(bag["filename"])
     
 
