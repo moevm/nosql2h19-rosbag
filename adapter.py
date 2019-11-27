@@ -3,7 +3,6 @@
 import rosbag
 import rosmsg
 from operator import itemgetter
-import json
 import string
 from datetime import datetime
 import os
@@ -105,7 +104,7 @@ def getMsgsWithTopic(bag):
         firstIteration = True	#allows header row
         for _, msg, t in bag.read_messages(topicName):	# for each instant in time that has data for topicName
             #parse data from this instant, which is of the form of multiple lines of "Name: value\n"
-            #	- put it in the form of a list of 2-element lists
+            #	- put it in the form of a list of 2-element lists\
             msgString = str(msg)
             msgList = string.split(msgString, '\n')
             instantaneousListOfData = []
@@ -167,22 +166,30 @@ def mergeStructureAndMsgs(bagfile, msgsWithTopics):
                     for msgName in fullMsgsList:
                         if msgName == msgDict["msg_name"]:
                             for row in msgsInColumns:
-                                msgDict["msgs"].append(row[columnNumbersOfMsg[msgNumber]])
+                                msg = row[columnNumbersOfMsg[msgNumber]]
+                                msgtype = msgDict["msg_type"]
+                                rightMsg = getMsgWithRightType(msg, msgtype)
+                                msgDict["msgs"].append(rightMsg)
                             break
                         msgNumber += 1
 
+def getMsgWithRightType(msg, msgType):
+    type = msgType.split('/')[-1]
+    if type in ["float32", "float64"]:
+        return float(msg)
+    if type in ["int8", "int16", "int32", "int64"]:
+        return int(msg)
+    return msg
+
 if __name__ == "__main__":
     # bagName = 'bags/2011-01-24-06-18-27.bag')
-    bagName = 'bags/Double.bag'
-    structure = getDataFromBag(bagName)
-    # print json.dumps(structure, indent=2)
-    pprint(structure)
-
     from pymongo import MongoClient
     client = MongoClient()
     db = client["test_database"]
 
-    newDocument = getDataFromBag('bags/hello.bag')
-    bags = db.bagfiles_test
-    post_id = bags.insert_one(newDocument).inserted_id
-    print(post_id)
+    for bagname in ['bags/Double.bag', 'bags/hello.bag', 'bags/square.bag']:
+        newDocument = getDataFromBag(bagname)
+        print(newDocument)
+        # bags = db.bagfiles_test
+        # post_id = bags.insert_one(newDocument).inserted_id
+        # print(post_id)
