@@ -1,15 +1,11 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-s
-from flask import Flask, render_template, jsonify, make_response
+from flask import Flask, render_template, jsonify, make_response, request
+import datetime
 from pymongo import MongoClient
 from adapter import getDataFromBag
 import dbQueryManager
 from pprint import pprint
-
-# from pymongo import MongoClient
-# client = MongoClient()
-# db = client["test_database"]
-# collection = db["bagfiles_test"]
 
 DB = dbQueryManager.dbQueryManager()
 app = Flask(__name__)
@@ -28,14 +24,10 @@ def getDocsData():
     return make_response(jsonify(ans), 200)
 
 
-@app.route('/addData', methods=['POST'])
+@app.route('/addData', methods=['GET'])
 def addData():
-    # newDocument = getDataFromBag('bags/square.bag')
-    # bags = db.bagfiles_test
-    # post_id = bags.insert_one(newDocument).inserted_id
-    # print(post_id)
-
-    ans = {'status': True}
+    print "add data resp"
+    ans = DB.addAll(defaultCollection)
     print(jsonify(ans))
     return make_response(jsonify(ans), 200)
 
@@ -48,5 +40,19 @@ def getFaceData():
     # print(DB.db)
     return make_response(jsonify(ans), 200)
 
+
+@app.route('/getFilterData', methods=['GET'])
+def getFilterData():
+    print("Server respones", request.args.get('dir'))
+    dir = request.args.get('dir')
+    date = datetime.datetime(2019, 11, 7, 0,0,0,0)
+    if dir == "more":
+        ans = DB.getBagsByDateDistance(defaultCollection, date, "more")
+    else:
+        ans = DB.getBagsByDateDistance(defaultCollection, date, "less")
+    # ans = collection.count({})
+    print(len(ans))
+    # print(DB.db)
+    return make_response(jsonify(ans), 200)
 if __name__ == '__main__':
     app.run(debug=True)

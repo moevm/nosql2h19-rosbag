@@ -3,6 +3,7 @@
 from pymongo import MongoClient
 import datetime
 from pprint import pprint
+from adapter import getDataFromBag
 
 
 class dbQueryManager(object):
@@ -16,6 +17,15 @@ class dbQueryManager(object):
     def __init__(self, db_name="test_database"):
         self.client = MongoClient()
         self.db = self.client[db_name]
+
+    def addAll(self, collection_name):
+        for bagname in ['bags/Double.bag', 'bags/hello.bag', 'bags/square.bag']:
+            newDocument = getDataFromBag(bagname)
+            collection = self.db[collection_name]
+            post_id = collection.insert_one(newDocument).inserted_id
+            print("Id добавленного:", post_id)
+        resultCursor = collection.find({}, {"topics_list.msgs_list.msgs" : {"$slice": 10}})
+        return self.tmpGetDict(resultCursor)
 
 
     def getNumberOfDocuments(self, collection_name):
@@ -70,7 +80,8 @@ class dbQueryManager(object):
                 cmper: date
             }
         })
-        return dbQueryManager.__cursorToMap(resultCursor)
+        # return dbQueryManager.__cursorToMap(resultCursor)
+        return self.tmpGetDict(resultCursor)
 
     def getBagsByMsgsNumber(self, collection_name, min_num, max_num):
         # collection = self.db[collection_name]
@@ -163,8 +174,8 @@ if __name__ == "__main__":
     # lel = manager.getBagsByTopics(collection, ["quaternionTopic", "poseTopic"])
     # lel = manager.getBagsByTopics(collection, ["/chatter"])
     # lel = manager.getBagsByMsgsNumber(collection, 9, 1000)
-    # date = datetime.datetime(2019, 12, 1, 0,0,0,0)
-    # lel = manager.getBagsByDateDistance(collection, date, "more")
+    date = datetime.datetime(2019, 11, 10, 0,0,0,0)
+    lel = manager.getBagsByDateDistance(collection, date, "more")
 
     
     # print(manager.getNumberOfMsgs(collection))
@@ -172,7 +183,7 @@ if __name__ == "__main__":
     # kek = [elem["_id"] for elem in kek]
     # print(kek)
 
-    # for bag in lel.values():
-    #     print(bag["filename"])
+    for bag in lel.values():
+        print(bag["filename"])
     
 
