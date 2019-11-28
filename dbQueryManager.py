@@ -117,27 +117,57 @@ class dbQueryManager(object):
         #     pprint(kek["filename"])
         return dbQueryManager.__cursorToMap(ans)
 
-    # def getNumberOfMsgs(self, collection_name):
-    #     # pass
-    #     resultCursor = collection.aggregate([
-    #         {
-    #             "$project": {
-    #                 "msgs": {
-    #                     "$map": {
-    #                         "input": "topics_list",
-    #                         "as": "topicMsgs",
-    #                         "in": {
-    #                             "$add": 
-    #                         }
-    #                     }
-    #                 }
-    #             }
-    #         }
-    #     ]
-            
-    #     )
-    #     return dbQueryManager.__cursorToMap(resultCursor)
-    #     # return list(resultCursor)
+
+    def getStats(self, collection_name):
+        collection = self.db[collection_name]
+        topic = "quaternionTopic"
+        msgName = "x"
+        summary = collection.aggregate([
+            { "$match": { 
+            "$and": [
+                    { "filename": "Double.bag" },
+                    { "topics_list.topic_name": topic },
+                    { "topics_list.msgs_list.msg_name": msgName }
+            ]
+            } }, # Match documents to shrink their quantity
+            { "$project": {
+            #  "list": "$topics_list.msgs_list.msgs",
+                "filteredByTopic": {
+                    "$filter": {
+                    "input": "$topics_list",
+                    "cond": { "$and": [
+                        { "$eq": [ '$$this.topic_name', topic ] },
+                        ] }
+                    }
+                }
+            } }, # Filter topics_list by topic name
+            { "$project": {
+                "filteredByTopic": {"$arrayElemAt": ["$filteredByTopic", 0] },
+            } }, # Take first elem in result
+            { "$project": {
+                "filteredByTopic": "$filteredByTopic.msgs_list",
+            } }, # Take msges in that topic
+            { "$project": {
+                "filteredByMsgName": {
+                    "$filter": {
+                        "input": "$filteredByTopic",
+                        "cond": {
+                            "$eq": [ "$$this.msg_name", msgName]
+                        }
+                    }
+                }
+            } }, # Filter msges by msg name
+            { "$project": {
+                "filteredByMsgName": {"$arrayElemAt": ["$filteredByMsgName", 0] },
+            } }, # Take first elem in result
+        { "$project": {
+            "sum": { "$sum": "$filteredByMsgName.msgs" },
+        } }, # Sum all elements in msgs
+        ]) # .next()
+        return self.tmpGetDict(summary)
+
+    def getNumberOfMsgs(self, collection_name):
+        pass
 
     def tmpGetDict(self, iterableOfMaps):
         returned = {}

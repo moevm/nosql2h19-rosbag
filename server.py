@@ -54,5 +54,11 @@ def getFilterData():
     print(len(ans))
     # print(DB.db)
     return make_response(jsonify(ans), 200)
+
+@app.route('/getStats', methods=['GET'])
+def getStats():
+    ans = DB.getStats(defaultCollection)
+    return make_response(jsonify(ans), 200)
+
 if __name__ == '__main__':
     app.run(debug=True)
