@@ -164,7 +164,7 @@ class dbQueryManager(object):
             "sum": { "$sum": "$filteredByMsgName.msgs" },
         } }, # Sum all elements in msgs
         ]) # .next()
-        return self.tmpGetDict(summary)
+        return self.tmpGetDict(sum)
 
     def getNumberOfMsgs(self, collection_name):
         pass
