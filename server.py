@@ -1,14 +1,19 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-s
-from flask import Flask, render_template, jsonify, make_response, request
+from flask import Flask, render_template, jsonify, make_response, request, redirect, url_for
+from werkzeug.utils import secure_filename
 import datetime
+import os
 from pymongo import MongoClient
 from adapter import getDataFromBag
 import dbQueryManager
 from pprint import pprint
 
+UPLOAD_FOLDER = '/path/to/the/uploads'
+
 DB = dbQueryManager.dbQueryManager()
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = "bags/" 
 defaultCollection = "bagfiles_test"
 
 @app.route("/")
@@ -59,6 +64,22 @@ def getFilterData():
 def getStats():
     ans = DB.getStats(defaultCollection)
     return make_response(jsonify(ans), 200)
+
+@app.route("/uploadBags", methods=['GET', 'POST'])
+def uploadBags():
+    if request.method == 'POST':
+        file = request.files['upload']
+        print(file.filename)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            return make_response(jsonify({"ans": "1"}), 200)
+    return make_response(jsonify({"status": "error"}), 200)
+
+def allowed_file(filename):
+    ALLOWED_EXTENSIONS = set(['bag'])
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 if __name__ == '__main__':
     app.run(debug=True)

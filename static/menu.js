@@ -80,27 +80,28 @@ var Menu = {
 
                 })
             }
-            
-            if (id == "chooseUpload") {
-                webix.alert("Данные добавлены");
-                $$("mainTable").clearAll()
-                webix.ajax("/addData", function(result) {
-                    result = JSON.parse(result)
-                    let i = 0
-                    for (var key in result) {
-                        // check if the property/key is defined in the object itself, not in parent
-                        console.log(result[key]["topics_list"])
-                        $$("mainTable").parse([{
-                            id: i,
-                            filename: result[key]["filename"],
-                            creation: result[key]["date_creation"],
-                            topics: result[key]["topics_list"],
-                            duration: result[key]["duration"]
-                        }])
-                        i++
-                    }
 
-                })
+            if (id == "chooseUpload") {
+                // webix.alert("Данные добавлены");
+                // $$("mainTable").clearAll()
+                $$("windowUpload").show()
+                // webix.ajax("/addData", function(result) {
+                //     result = JSON.parse(result)
+                //     let i = 0
+                //     for (var key in result) {
+                //         // check if the property/key is defined in the object itself, not in parent
+                //         console.log(result[key]["topics_list"])
+                //         $$("mainTable").parse([{
+                //             id: i,
+                //             filename: result[key]["filename"],
+                //             creation: result[key]["date_creation"],
+                //             topics: result[key]["topics_list"],
+                //             duration: result[key]["duration"]
+                //         }])
+                //         i++
+                //     }
+
+                // })
             }
             if (id == "4") {
                 // $$("mainTable").clearAll()

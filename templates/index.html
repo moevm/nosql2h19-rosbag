@@ -10,6 +10,7 @@
 <script src="../static/header.js" type="text/javascript"></script>
 <script src="../static/menu.js" type="text/javascript"></script>
 <script src="../static/mainTable.js" type="text/javascript"></script>
+<script src="../static/windowUpload.js" type="text/javascript"></script>
 
 
 <title>Hello from Flask</title>
@@ -26,6 +27,7 @@
 <script type="text/javascript" charset="utf-8">
     webix.ready(function() {
         webix.ui(TopicsTable)
+        webix.ui(WindowUpload)
         grida = webix.ui({
             "rows": [Header, {
                 "type": "wide",
