@@ -4,10 +4,8 @@ from flask import Flask, render_template, jsonify, make_response, request, redir
 from werkzeug.utils import secure_filename
 import datetime
 import os
-from pymongo import MongoClient
 from adapter import getDataFromBag
 import dbQueryManager
-from pprint import pprint
 
 UPLOAD_FOLDER = '/path/to/the/uploads'
 
@@ -28,36 +26,21 @@ def getDocsData():
     print(jsonify(ans))
     return make_response(jsonify(ans), 200)
 
-
-@app.route('/addData', methods=['GET'])
-def addData():
-    print "add data resp"
-    ans = DB.addAll(defaultCollection)
-    print(jsonify(ans))
-    return make_response(jsonify(ans), 200)
-
 @app.route('/getFaceData', methods=['GET'])
 def getFaceData():
     print("Server respones get")
     ans = DB.getMainInfo(defaultCollection)
-    # ans = collection.count({})
-    print(ans)
-    # print(DB.db)
     return make_response(jsonify(ans), 200)
 
 
 @app.route('/getFilterData', methods=['GET'])
 def getFilterData():
-    print("Server respones", request.args.get('dir'))
     dir = request.args.get('dir')
     date = datetime.datetime(2019, 11, 7, 0,0,0,0)
     if dir == "more":
         ans = DB.getBagsByDateDistance(defaultCollection, date, "more")
     else:
         ans = DB.getBagsByDateDistance(defaultCollection, date, "less")
-    # ans = collection.count({})
-    print(len(ans))
-    # print(DB.db)
     return make_response(jsonify(ans), 200)
 
 @app.route('/getStats', methods=['GET'])
@@ -69,7 +52,6 @@ def getStats():
 def uploadBags():
     if request.method == 'POST':
         file = request.files['upload']
-        print(file.filename)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
