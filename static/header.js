@@ -1,4 +1,4 @@
-var header = {
+var Header = {
     "view": "toolbar",
     "css": "webix_dark",
     "padding": {

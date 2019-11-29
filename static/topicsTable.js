@@ -1,5 +1,5 @@
-var tableForTopics = {
-    id: "tableForTopics",
+var TopicsTable = {
+    id: "topicsTable",
     view: 'window',
     head: 'Топики файла',
     modal: true,
@@ -39,7 +39,7 @@ var tableForTopics = {
                     //     return "<div class='webix_el_button'><button class='webixtype_base'>Показать топики</button></div>";
                     // }
                 }],
-                "id": "topicsTable",
+                "id": "topics",
                 "select": true,
                 "scrollX": false,
                 "fixedRowHeight": false,

@@ -4,7 +4,7 @@ var Menu = {
     layout: "y",
     subMenuPos: "right",
     data: [{
-        id: "1",
+        id: "chooseUpload",
         value: "Добавить..."
     }, {
         id: "2",
@@ -80,7 +80,8 @@ var Menu = {
 
                 })
             }
-            if (id == "1") {
+            
+            if (id == "chooseUpload") {
                 webix.alert("Данные добавлены");
                 $$("mainTable").clearAll()
                 webix.ajax("/addData", function(result) {

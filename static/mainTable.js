@@ -39,7 +39,7 @@ var MainTable = {
     onClick: {
         webixtype_base: function(ev, id, html) {
             // webix.alert("Clicked row "+id);
-            $$("tableForTopics").show();
+            $$("topicsTable").show();
             // $$('login').focus();
         }
     },
