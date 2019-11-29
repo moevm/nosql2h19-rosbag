@@ -5,6 +5,7 @@ import datetime
 from pprint import pprint
 from adapter import getDataFromBag
 
+STORAGE_UPLOAD = "bags/"
 
 class dbQueryManager(object):
     def __new__(self, db_name="test_database"):
@@ -26,6 +27,16 @@ class dbQueryManager(object):
             print("Id добавленного:", post_id)
         resultCursor = collection.find({}, {"topics_list.msgs_list.msgs" : {"$slice": 10}})
         return self.tmpGetDict(resultCursor)
+
+    def addFile(self, collection_name, fileName):
+        try:
+            bagname = STORAGE_UPLOAD + fileName
+            newDocument = getDataFromBag(bagname)
+            collection = self.db[collection_name]
+            collection.insert_one(newDocument)
+        except Exception:
+            return False
+        return True
 
 
     def getNumberOfDocuments(self, collection_name):

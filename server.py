@@ -7,11 +7,9 @@ import os
 from adapter import getDataFromBag
 import dbQueryManager
 
-UPLOAD_FOLDER = '/path/to/the/uploads'
-
 DB = dbQueryManager.dbQueryManager()
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = "bags/" 
+app.config['UPLOAD_FOLDER'] = dbQueryManager.STORAGE_UPLOAD
 defaultCollection = "bagfiles_test"
 
 @app.route("/")
@@ -54,7 +52,11 @@ def uploadBags():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return make_response(jsonify({"ans": "1"}), 200)
+            status = DB.addFile(defaultCollection, filename)
+            if status:
+                return make_response(jsonify({"status": "server"}), 200)
+            else:
+                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
     return make_response(jsonify({"status": "error"}), 200)
 
 def allowed_file(filename):
