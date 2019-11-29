@@ -1,5 +1,13 @@
 var MainTable = {
     "view": "datatable",
+    "id": "mainTable",
+    "select": true,
+    "scrollX": false,
+    "fixedRowHeight": false,
+    "multiselect": false,
+    "footer": false,
+    "checkboxRefresh": false,
+    "width": null,
     "columns": [{
         id: "filename",
         "header": "Название",
@@ -28,14 +36,6 @@ var MainTable = {
         "fillspace": true,
         "hidden": false
     }],
-    "id": "mainTable",
-    "select": true,
-    "scrollX": false,
-    "fixedRowHeight": false,
-    "multiselect": false,
-    "footer": false,
-    "checkboxRefresh": false,
-    "width": null,
     onClick: {
         webixtype_base: function(ev, id, html) {
             // webix.alert("Clicked row "+id);
@@ -54,6 +54,7 @@ var MainTable = {
 
     url: function() {
         $$("mainTable").clearAll()
+        webix.alert("load data!")
         return webix.promise(function(res) {
             setTimeout(function() {
                 res(webix.ajax("/getFaceData", function(result) {

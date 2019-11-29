@@ -28,7 +28,6 @@ def getDocsData():
 
 @app.route('/getFaceData', methods=['GET'])
 def getFaceData():
-    print("Server respones get")
     ans = DB.getMainInfo(defaultCollection)
     return make_response(jsonify(ans), 200)
 

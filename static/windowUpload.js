@@ -14,7 +14,13 @@ var WindowUpload = {
                 value: "Загрузить",
                 name: "files",
                 link: "uploadedFilesList",
-                upload: "/uploadBags"
+                upload: "/uploadBags",
+                on: {
+                    onUploadComplete: function(){
+                        // TODO update data table after uploading complete
+                        // $$("mainTable").refresh()
+                    }
+                }
             },
             {
                 view: "list",
