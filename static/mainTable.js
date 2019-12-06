@@ -52,17 +52,18 @@ var MainTable = {
         }
     },
 
-    url: function() {
+    url: 
+    function() {
         $$("mainTable").clearAll()
-        webix.alert("load data!")
+        // webix.alert("load data!")
         return webix.promise(function(res) {
             setTimeout(function() {
                 res(webix.ajax("/getFaceData", function(result) {
                     result = JSON.parse(result)
-                    console.log(result);
+                    // console.log(result);
                     let i = 0
                     for (var key in result) {
-                        console.log(key)
+                        // console.log(key)
                         $$("mainTable").parse([{
                             id: i,
                             filename: result[key]["filename"],
@@ -72,7 +73,6 @@ var MainTable = {
                         }])
                         i++
                     }
-
                 }));
             }, 1000)
         });
