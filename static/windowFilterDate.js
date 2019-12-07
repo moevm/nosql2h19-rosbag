@@ -36,9 +36,20 @@ var WindowFilterDate = {
                 view: "button",
                 label: "Отфильтровать",
                 click: function() {
-                    date = $$("dateChooser").getValue();
-                    dir = $$("dirChooser").getValue();
-                    console.log(date, dir)
+                    selectedDate = $$("dateChooser").getValue();
+                    selectedDirID = $$("dirChooser").getValue();
+                    console.log(selectedDate, selectedDirID)
+
+                    if (selectedDate == null){
+                        webix.alert("Вы не выбрали дату!")
+                        return
+                    }
+
+                    updateMainTableByRequest("mainTable", "/getFilterData", {
+                        filterItem: "date",
+                        date: selectedDate,
+                        dir: convertIDtoDir(selectedDirID)
+                    });
                     this.getParentView().getParentView().hide()
                 }
             }
@@ -46,11 +57,20 @@ var WindowFilterDate = {
     },
     move: true,
     on: {
-        onHide: function() {
-            updateMainTable("mainTable", "/getFilterData", {
-                filterItem: "data",
-                dir: "less"
-            });
-        }
+        // onHide: function() {
+        //     updateMainTableByRequest("mainTable", "/getFilterData", {
+        //         filterItem: "data",
+        //         dir: "less"
+        //     });
+        // }
     }
+}
+
+function convertIDtoDir(id){
+    if (id == 0)
+        return "exactly"
+    if (id == 1)
+        return "more"
+    if (id == 3)
+        return "less"
 }
