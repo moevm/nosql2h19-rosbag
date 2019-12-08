@@ -50,19 +50,13 @@ var WindowFilterDuration = {
                 label: "Отфильтровать",
                 click: function() {
                     console.log("Filter by duration!")
-                    // selectedDate = $$("dateChooser").getValue();
-                    // selectedDirID = $$("dirChooser").getValue();
-                    // console.log(selectedDate, selectedDirID)
+                    selectedDuration = $$("dateChooser").getValue();
+                    console.log(selectedDuration)
 
-                    // if (selectedDate == null){
-                    //     webix.alert("Вы не выбрали дату!")
-                    //     return
-                    // }
-                    // updateMainTableByRequest("mainTable", "/getFilterData", {
-                    //     filterItem: "date",
-                    //     date: selectedDate,
-                    //     dir: convertIDtoDir(selectedDirID)
-                    // });
+                    updateMainTableByRequest("mainTable", "/getFilterData", {
+                        filterItem: "duration",
+                        duration: selectedDuration,
+                    });
                     this.getParentView().getParentView().hide()
                 }
             }

@@ -45,6 +45,11 @@ def getFilterData():
             ans = DB.getBagsByDateDistance(defaultCollection, date, "more")
         if direction == "less":
             ans = DB.getBagsByDateDistance(defaultCollection, date, "less")
+    
+    if filterItem == "duration":
+        duration = request.args.get('duration')
+        print(duration)
+        ans = DB.getBagsByDuration(defaultCollection, 0, duration)
     return make_response(jsonify(ans), 200)
 
 @app.route('/getStats', methods=['GET'])
