@@ -3,4 +3,5 @@ testMongo.py
 nosql.txt
 .vscode/
 bags/
+static/codebase/
 *.pyc
