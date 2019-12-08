@@ -19,11 +19,8 @@ var Menu = {
             id: "filterBySize",
             value: "Размеру"
         }]
-    }, {
-        id: "3",
-        value: "Фильтр 7.11 less",
-    }, {
-        id: "4",
+    },{
+        id: "stats",
         value: "Статистика"
     }],
     on: {

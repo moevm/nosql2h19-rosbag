@@ -8,6 +8,7 @@ var WindowFilterDate = {
     resize: true,
     position: 'center',
     close: true,
+    move: true,
     body: {
         view: 'form',
         rows: [{
@@ -38,6 +39,7 @@ var WindowFilterDate = {
                 view: "button",
                 label: "Отфильтровать",
                 click: function() {
+                    // TODO ограничение видимости дат для существующих файлов
                     selectedDate = $$("dateChooser").getValue();
                     selectedDirID = $$("dirChooser").getValue();
                     console.log(selectedDate, selectedDirID)
@@ -56,15 +58,6 @@ var WindowFilterDate = {
             }
         ]
     },
-    move: true,
-    on: {
-        // onHide: function() {
-        //     updateMainTableByRequest("mainTable", "/getFilterData", {
-        //         filterItem: "data",
-        //         dir: "less"
-        //     });
-        // }
-    }
 }
 
 function convertIDtoDir(id){
