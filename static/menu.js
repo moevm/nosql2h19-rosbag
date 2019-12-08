@@ -32,9 +32,11 @@ var Menu = {
             if (id == "filterByDate") {
                 $$("windowFilterDate").show()
             }
+            if (id == "filterBySize"){
+                $$("windowFilterDuration").show()
+            }
 
             if (id == "4") {
-                // $$("mainTable").clearAll()
                 webix.ajax("/getStats", function(result) {
                     result = JSON.parse(result)
                     let text = ""
