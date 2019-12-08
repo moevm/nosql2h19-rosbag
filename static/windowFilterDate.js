@@ -13,6 +13,8 @@ var WindowFilterDate = {
         rows: [{
                 view: "datepicker",
                 id: "dateChooser",
+                stringResult: true,
+                timepicker: false,
                 label: "Основная дата:",
                 labelWidth: 170
             },
@@ -44,7 +46,6 @@ var WindowFilterDate = {
                         webix.alert("Вы не выбрали дату!")
                         return
                     }
-
                     updateMainTableByRequest("mainTable", "/getFilterData", {
                         filterItem: "date",
                         date: selectedDate,
@@ -71,6 +72,7 @@ function convertIDtoDir(id){
         return "exactly"
     if (id == 1)
         return "more"
-    if (id == 3)
+    if (id == 2)
         return "less"
+    console.assert("Error id dir")
 }

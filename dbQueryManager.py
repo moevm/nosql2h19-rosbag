@@ -78,8 +78,10 @@ class dbQueryManager(object):
     def getBagsByDateDistance(self, collection_name, date, direction):
         if direction == "more":
             cmper = "$gte"
-        else:
+        if direction == "less":
             cmper = "$lte"
+        if direction == "exactly":
+            cmper = "$eq"
         collection = self.db[collection_name]
         resultCursor = collection.find({
             "date_creation": {

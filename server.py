@@ -33,15 +33,17 @@ def getFaceData():
 @app.route('/getFilterData', methods=['GET'])
 def getFilterData():
     filterItem = request.args.get('filterItem')
-    print(filterItem)
     if (filterItem == "date"):
-        dir = request.args.get('dir')
+        direction = request.args.get('dir')
         date = request.args.get('date')
-        if dir == "exactly":
-            pass # TODO 
-        if dir == "more":
+        date = datetime.datetime.strptime(date, "%Y-%m-%d %X")
+        ans = ""
+
+        if direction == "exactly":
+            ans = DB.getBagsByDateDistance(defaultCollection, date, "exactly")
+        if direction == "more":
             ans = DB.getBagsByDateDistance(defaultCollection, date, "more")
-        if dir == "less":
+        if direction == "less":
             ans = DB.getBagsByDateDistance(defaultCollection, date, "less")
     return make_response(jsonify(ans), 200)
 
