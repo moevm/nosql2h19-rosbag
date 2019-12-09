@@ -8,6 +8,7 @@ var MainTable = {
     "footer": false,
     "checkboxRefresh": false,
     "width": null,
+    "hidden": true,
     "columns": [{
         id: "filename",
         "header": "Название",
@@ -38,9 +39,8 @@ var MainTable = {
     }],
     onClick: {
         webixtype_base: function(ev, id, html) {
-            // webix.alert("Clicked row "+id);
-            $$("topicsTable").show();
-            // $$('login').focus();
+            tableManager.showTopicsTable();
+            // сделеать запрос
         }
     },
     on: {
@@ -52,28 +52,10 @@ var MainTable = {
         }
     },
 
-    url: function() {
-        $$("mainTable").clearAll()
-        webix.alert("load data!")
-        return webix.promise(function(res) {
+    url: () => {
+        return webix.promise(function(resolve) {
             setTimeout(function() {
-                res(webix.ajax("/getFaceData", function(result) {
-                    result = JSON.parse(result)
-                    console.log(result);
-                    let i = 0
-                    for (var key in result) {
-                        console.log(key)
-                        $$("mainTable").parse([{
-                            id: i,
-                            filename: result[key]["filename"],
-                            creation: result[key]["date_creation"],
-                            topics: result[key]["topics_list"],
-                            duration: result[key]["duration"]
-                        }])
-                        i++
-                    }
-
-                }));
+                tableManager.updateMainTableByRequest("/getFaceData")
             }, 1000)
         });
     }

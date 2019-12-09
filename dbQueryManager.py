@@ -19,6 +19,8 @@ class dbQueryManager(object):
         self.client = MongoClient()
         self.db = self.client[db_name]
 
+
+
     def addAll(self, collection_name):
         for bagname in ['bags/Double.bag', 'bags/hello.bag', 'bags/square.bag']:
             newDocument = getDataFromBag(bagname)
@@ -27,6 +29,8 @@ class dbQueryManager(object):
             print("Id добавленного:", post_id)
         resultCursor = collection.find({}, {"topics_list.msgs_list.msgs" : {"$slice": 10}})
         return self.tmpGetDict(resultCursor)
+
+
 
     def addFile(self, collection_name, fileName):
         try:
@@ -37,6 +41,7 @@ class dbQueryManager(object):
         except Exception:
             return False
         return True
+
 
 
     def getNumberOfDocuments(self, collection_name):
@@ -78,8 +83,10 @@ class dbQueryManager(object):
     def getBagsByDateDistance(self, collection_name, date, direction):
         if direction == "more":
             cmper = "$gte"
-        else:
+        if direction == "less":
             cmper = "$lte"
+        if direction == "exactly":
+            cmper = "$eq"
         collection = self.db[collection_name]
         resultCursor = collection.find({
             "date_creation": {
@@ -88,6 +95,11 @@ class dbQueryManager(object):
         })
         # return dbQueryManager.__cursorToMap(resultCursor)
         return self.tmpGetDict(resultCursor)
+
+    def getBagsByDuration(self, collection_name, duration_min, duration_max):
+        # TODO
+        return "todo this"
+
 
     def getBagsByMsgsNumber(self, collection_name, min_num, max_num):
         collection = self.db[collection_name]

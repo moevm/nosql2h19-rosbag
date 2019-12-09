@@ -32,12 +32,24 @@ def getFaceData():
 
 @app.route('/getFilterData', methods=['GET'])
 def getFilterData():
-    dir = request.args.get('dir')
-    date = datetime.datetime(2019, 11, 7, 0,0,0,0)
-    if dir == "more":
-        ans = DB.getBagsByDateDistance(defaultCollection, date, "more")
-    else:
-        ans = DB.getBagsByDateDistance(defaultCollection, date, "less")
+    filterItem = request.args.get('filterItem')
+    if (filterItem == "date"):
+        direction = request.args.get('dir')
+        date = request.args.get('date')
+        date = datetime.datetime.strptime(date, "%Y-%m-%d %X")
+        ans = ""
+
+        if direction == "exactly":
+            ans = DB.getBagsByDateDistance(defaultCollection, date, "exactly")
+        if direction == "more":
+            ans = DB.getBagsByDateDistance(defaultCollection, date, "more")
+        if direction == "less":
+            ans = DB.getBagsByDateDistance(defaultCollection, date, "less")
+    
+    if filterItem == "duration":
+        duration = request.args.get('duration')
+        print(duration)
+        ans = DB.getBagsByDuration(defaultCollection, 0, duration)
     return make_response(jsonify(ans), 200)
 
 @app.route('/getStats', methods=['GET'])
