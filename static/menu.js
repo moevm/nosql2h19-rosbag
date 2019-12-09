@@ -36,19 +36,21 @@ var Menu = {
                 $$("windowFilterDuration").show()
             }
 
-            if (id == "4") {
-                webix.ajax("/getStats", function(result) {
-                    result = JSON.parse(result)
-                    let text = ""
-                    for (var id in result) {
-                        text = text + result[id]["sum"] + "\n"
-                    }
-                    webix.alert({
-                        title: "Сумма значений топика quaternionTopic сообщений X",
-                        width: 400,
-                        text: text
-                    });
-                })
+            if (id == "stats") {
+                // $$("mainTable").hide()
+                // $$("mainTable_2").show()
+                // webix.ajax("/getStats", function(result) {
+                //     result = JSON.parse(result)
+                //     let text = ""
+                //     for (var id in result) {
+                //         text = text + result[id]["sum"] + "\n"
+                //     }
+                //     webix.alert({
+                //         title: "Сумма значений топика quaternionTopic сообщений X",
+                //         width: 400,
+                //         text: text
+                //     });
+                // })
             }
         },
     }

@@ -8,6 +8,7 @@ var MainTable = {
     "footer": false,
     "checkboxRefresh": false,
     "width": null,
+    "hidden": true,
     "columns": [{
         id: "filename",
         "header": "Название",

@@ -15,7 +15,7 @@ var WindowFilterDuration = {
             {
                 id: "valueOutput",
                 view: "text",
-                value: '0',
+                value: '80',
                 label: "Длительность",
                 labelWidth: 120,
                 width: 400,
