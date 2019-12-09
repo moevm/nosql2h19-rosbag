@@ -11,11 +11,11 @@ var TopicsTable = {
     "hidden": true,
 
     "columns": [{
-        id: "topicname",
+        id: "topic_name",
         "header": "Название топика",
         "fillspace": true,
         "sort": "string",
-        "hidden": false
+        "hidden": false,
     }, {
         id: "msgs_type",
         "header": "Типы сообщений",

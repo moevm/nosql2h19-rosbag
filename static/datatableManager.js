@@ -45,18 +45,21 @@ class datatableManager {
         webix.ajax(requestString, requestData, function(result) {
             result = JSON.parse(result)
             console.log(result)
-            let i = 0
-            // for (var key in result) {
-            //     console.log(key)
-            //     $$(tableID).parse([{
-            //         id: i,
-            //         filename: result[key]["filename"],
-            //         creation: result[key]["date_creation"],
-            //         topics: result[key]["topics_list"],
-            //         duration: result[key]["duration"]
-            //     }])
-            //     i++
-            // }
+            
+            for (var key in result) {
+                let topicsNumber = result[key]["topic_name"].length
+                console.log(topicsNumber)
+                console.log(key)
+                for (var i = 0; i < topicsNumber; i++){
+                    console.log(result[key]["topic_name"][i])
+                    $$(tableID).add({
+                        id: i,
+                        topic_name: result[key]["topic_name"][i],
+                        msgs_type: result[key]["msgs_type"][i],
+                        msgs_num: result[key]["msgs_num"][i],
+                    })
+                }
+            }
         });
     }
     
