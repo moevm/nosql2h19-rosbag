@@ -20,14 +20,14 @@ class datatableManager {
     updateMainTableByRequest(requestString, requestData){
         $$(`${this.idMainTable}`).clearAll()
         const tableID = this.idMainTable
-        
+
         webix.ajax(requestString, requestData, function(result) {
             result = JSON.parse(result)
             let i = 0
             for (var key in result) {
                 console.log(key)
                 $$(tableID).parse([{
-                    id: i,
+                    id: key,
                     filename: result[key]["filename"],
                     creation: result[key]["date_creation"],
                     topics: result[key]["topics_list"],
@@ -35,6 +35,28 @@ class datatableManager {
                 }])
                 i++
             }
+        });
+    }
+
+    updateTopicsTableByRequest(requestString, requestData){
+        $$(`${this.idTopicsTable}`).clearAll()
+        const tableID = this.idTopicsTable
+        
+        webix.ajax(requestString, requestData, function(result) {
+            result = JSON.parse(result)
+            console.log(result)
+            let i = 0
+            // for (var key in result) {
+            //     console.log(key)
+            //     $$(tableID).parse([{
+            //         id: i,
+            //         filename: result[key]["filename"],
+            //         creation: result[key]["date_creation"],
+            //         topics: result[key]["topics_list"],
+            //         duration: result[key]["duration"]
+            //     }])
+            //     i++
+            // }
         });
     }
     
