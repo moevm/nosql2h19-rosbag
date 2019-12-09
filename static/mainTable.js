@@ -1,9 +1,10 @@
 var MainTable = {
-    "view": "datatable",
     "id": "mainTable",
+    "view": "datatable",
     "select": true,
     "scrollX": false,
     "fixedRowHeight": false,
+    // "rowHeight": 100,
     "multiselect": false,
     "footer": false,
     "checkboxRefresh": false,
@@ -28,7 +29,7 @@ var MainTable = {
         "fillspace": true,
         "hidden": false,
         template: function(obj) {
-            return "<div class='webix_el_button'><button class='webixtype_base'>Показать топики</button></div>";
+            return "<button class='callTopicsBtn'>Показать топики</button>";
         }
     }, {
         id: "duration",
@@ -38,9 +39,11 @@ var MainTable = {
         "hidden": false
     }],
     onClick: {
-        webixtype_base: function(ev, id, html) {
+        callTopicsBtn: function(event, cell, target) {
             tableManager.showTopicsTable();
-            // сделеать запрос
+            tableManager.updateTopicsTableByRequest("/getTopicsById", {
+                id: cell["row"]
+            });
         }
     },
     on: {

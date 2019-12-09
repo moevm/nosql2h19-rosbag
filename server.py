@@ -71,6 +71,13 @@ def uploadBags():
                 os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
     return make_response(jsonify({"status": "error"}), 200)
 
+@app.route("/getTopicsById", methods=['GET'])
+def getTopicsById():
+    bagId = request.args.get('id')
+    print(bagId)
+    ans = DB.getTopicsInfoById(defaultCollection, bagId)
+    return make_response(jsonify(ans), 200)
+
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = set(['bag'])
     return '.' in filename and \

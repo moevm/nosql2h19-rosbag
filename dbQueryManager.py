@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-s
 from pymongo import MongoClient
+from bson.objectid import ObjectId  
 import datetime
 from pprint import pprint
 from adapter import getDataFromBag
@@ -200,6 +201,23 @@ class dbQueryManager(object):
             # print int(getattr(objID, '_ObjectId__id'), 0)
             returned[objID] = obj
         return returned
+    
+    def getTopicsInfoById(self, collection_name, bagId):
+        collection = self.db[collection_name]
+        ans = collection.aggregate([{
+                "$match": {
+                    "_id": ObjectId(bagId)
+                }
+            },{
+                "$project": {
+                    "msgs_num": "$topics_list.msgs_num",
+                    "msgs_type": "$topics_list.msgs_type",
+                    "topic_name":"$topics_list.topic_name",
+                }
+            }
+        ])
+        return self.tmpGetDict(ans)
+
 
     @staticmethod
     def __cursorToMap(iterableOfMaps):
@@ -208,7 +226,6 @@ class dbQueryManager(object):
             objID = obj.pop("_id")
             returned[objID] = obj
         return returned
-
 
 
 if __name__ == "__main__":

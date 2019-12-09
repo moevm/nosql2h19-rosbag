@@ -1,6 +1,8 @@
-var Menu = {
+var MainMenu = {
+    "id": "mainMenu",
     "view": "menu",
     "width": 163,
+    "hidden": true,
     layout: "y",
     subMenuPos: "right",
     data: [{
@@ -22,7 +24,7 @@ var Menu = {
     },{
         id: "stats",
         value: "Статистика"
-    }],
+    }], // TODO добавить кнопку сбросить
     on: {
         onMenuItemClick: function(id) {
             if (id == "chooseUpload") {
