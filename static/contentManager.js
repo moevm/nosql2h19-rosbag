@@ -1,20 +1,29 @@
-class datatableManager {
-    constructor(idMainTable, idTopicsTable){
+class contentManager {
+    constructor(idMainTable, idTopicsTable, idMainMenu, idTopicsMenu){
         this.idMainTable = idMainTable
         this.idTopicsTable = idTopicsTable
+        this.idMainMenu = idMainMenu
+        this.idTopicsMenu = idTopicsMenu
         this.activeTable = idMainTable
+        this.activeMenu = idMainMenu
     }
 
     showMainTable(){
         $$(`${this.activeTable}`).hide()
+        $$(`${this.activeMenu}`).hide()
         $$(`${this.idMainTable}`).show()
+        $$(`${this.idMainMenu}`).show()
         this.activeTable = this.idMainTable
+        this.activeMenu = this.idMainMenu
     }
 
     showTopicsTable(){
         $$(`${this.activeTable}`).hide()
+        $$(`${this.activeMenu}`).hide()
         $$(`${this.idTopicsTable}`).show()
+        $$(`${this.idTopicsMenu}`).show()
         this.activeTable = this.idTopicsTable
+        this.activeMenu = this.idTopicsMenu
     }
 
     updateMainTableByRequest(requestString, requestData){

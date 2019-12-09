@@ -1,6 +1,6 @@
 var MainTable = {
-    "view": "datatable",
     "id": "mainTable",
+    "view": "datatable",
     "select": true,
     "scrollX": false,
     "fixedRowHeight": false,
