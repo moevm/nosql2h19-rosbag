@@ -48,7 +48,7 @@ var WindowFilterDate = {
                         webix.alert("Вы не выбрали дату!")
                         return
                     }
-                    updateMainTableByRequest("mainTable", "/getFilterData", {
+                    tableManager.updateMainTableByRequest("/getFilterData", {
                         filterItem: "date",
                         date: selectedDate,
                         dir: convertIDtoDir(selectedDirID)

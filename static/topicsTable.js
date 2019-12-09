@@ -52,12 +52,4 @@ var TopicsTable = {
             this.hideOverlay();
         }
     },
-
-    // url: () => {
-    //     return webix.promise(function(resolve) {
-    //         setTimeout(function() {
-    //             updateMainTableByRequest("mainTable", "/getFaceData")
-    //         }, 1000)
-    //     });
-    // }
 }

@@ -39,9 +39,8 @@ var MainTable = {
     }],
     onClick: {
         webixtype_base: function(ev, id, html) {
-            // webix.alert("Clicked row "+id);
-            $$("topicsTable").show();
-            // $$('login').focus();
+            tableManager.showTopicsTable();
+            // сделеать запрос
         }
     },
     on: {
@@ -56,7 +55,7 @@ var MainTable = {
     url: () => {
         return webix.promise(function(resolve) {
             setTimeout(function() {
-                updateMainTableByRequest("mainTable", "/getFaceData")
+                tableManager.updateMainTableByRequest("/getFaceData")
             }, 1000)
         });
     }

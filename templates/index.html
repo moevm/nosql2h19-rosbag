@@ -1,11 +1,11 @@
 <!doctype html>
 <link rel="stylesheet" href="https://cdn.webix.com/edge/webix.css" type="text/css">
-<script src="https://cdn.webix.com/edge/webix.js" type="text/javascript"></script>
-<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<!-- <script src="https://cdn.webix.com/edge/webix.js" type="text/javascript"></script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script> -->
 <!-- Webix CSS file   -->
-<!-- <link rel="stylesheet" href="../static/codebase/webix.css" type="text/css"> -->
+<link rel="stylesheet" href="../static/codebase/webix.css" type="text/css">
 <!-- Webix JS file-->    
-<!-- <script src="../static/codebase/webix.js" type="text/javascript"></script> -->
+<script src="../static/codebase/webix.js" type="text/javascript"></script>
 <!-- App files -->
 <script src="../static/topicsTable.js" type="text/javascript"></script>
 <script src="static/logic.js" type="text/javascript"></script>
@@ -20,28 +20,6 @@
 <title>Hello from Flask</title>
 <body>
 <script type="text/javascript" charset="utf-8">
-    function updateMainTableByRequest(tableID, requestString, requestData){
-        console.log("update!")
-        $$(tableID).clearAll()
-        webix.ajax(requestString, requestData, function(result) {
-            result = JSON.parse(result)
-            console.log(result);
-            let i = 0
-            for (var key in result) {
-                console.log(key)
-                $$(tableID).parse([{
-                    id: i,
-                    filename: result[key]["filename"],
-                    creation: result[key]["date_creation"],
-                    topics: result[key]["topics_list"],
-                    duration: result[key]["duration"]
-                }])
-                i++
-            }
-        });
-        // });
-    }
-
     // var current
     const tableManager = new datatableManager(MainTable["id"], TopicsTable["id"])
     webix.i18n.setLocale("ru-RU");

@@ -53,7 +53,7 @@ var WindowFilterDuration = {
                     selectedDuration = $$("dateChooser").getValue();
                     console.log(selectedDuration)
 
-                    updateMainTableByRequest("mainTable", "/getFilterData", {
+                    tableManager.updateMainTableByRequest("/getFilterData", {
                         filterItem: "duration",
                         duration: selectedDuration,
                     });
