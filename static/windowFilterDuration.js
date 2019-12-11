@@ -49,8 +49,7 @@ var WindowFilterDuration = {
                 view: "button",
                 label: "Отфильтровать",
                 click: function() {
-                    console.log("Filter by duration!")
-                    selectedDuration = $$("dateChooser").getValue();
+                    selectedDuration = $$("valueOutput").getValue();
                     console.log(selectedDuration)
 
                     tableManager.updateMainTableByRequest("/getFilterData", {

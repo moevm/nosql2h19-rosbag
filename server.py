@@ -35,17 +35,17 @@ def getFaceData():
 def getFilterData():
     filterItem = request.args.get('filterItem')
     if (filterItem == "date"):
+        bagIds = json.loads(request.args.get('ids'))
         direction = request.args.get('dir')
-        date = request.args.get('date')
-        date = datetime.datetime.strptime(date, "%Y-%m-%d %X")
+        date = datetime.datetime.strptime(request.args.get('date'), "%Y-%m-%d %X")
         ans = ""
 
         if direction == "exactly":
-            ans = DB.getBagsByDateDistance(defaultCollection, date, "exactly")
+            ans = DB.getBagsByDateDistance(defaultCollection, bagIds, date, "exactly")
         if direction == "more":
-            ans = DB.getBagsByDateDistance(defaultCollection, date, "more")
+            ans = DB.getBagsByDateDistance(defaultCollection, bagIds, date, "more")
         if direction == "less":
-            ans = DB.getBagsByDateDistance(defaultCollection, date, "less")
+            ans = DB.getBagsByDateDistance(defaultCollection, bagIds, date, "less")
     
     if filterItem == "duration":
         duration = request.args.get('duration')
@@ -82,14 +82,12 @@ def getTopicsById():
 @app.route("/getMaxMinDatesByIds", methods=['GET'])
 def getMaxMinDatesByIds():
     bagIds = json.loads(request.args.get('ids'))
-    print("Requestes ids:", bagIds)
     ans = DB.getMaxMinDatesByIds(defaultCollection, bagIds)
     return make_response(jsonify(ans), 200)
 
 @app.route("/getMaxMinDurationsByIds", methods=['GET'])
 def getMaxMinDurationsByIds():
     bagIds = json.loads(request.args.get('ids'))
-    print("Requestes ids:", bagIds)
     ans = DB.getMaxMinDurationsByIds(defaultCollection, bagIds)
     return make_response(jsonify(ans), 200)
 

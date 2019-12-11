@@ -27,7 +27,6 @@ class dbQueryManager(object):
             newDocument = getDataFromBag(bagname)
             collection = self.db[collection_name]
             post_id = collection.insert_one(newDocument).inserted_id
-            print("Id добавленного:", post_id)
         resultCursor = collection.find({}, {"topics_list.msgs_list.msgs" : {"$slice": 10}})
         return self.tmpGetDict(resultCursor)
 
@@ -48,7 +47,6 @@ class dbQueryManager(object):
     def getNumberOfDocuments(self, collection_name):
         collection = self.db[collection_name]
         result = collection.count({})
-        # result = 3
         return result
 
     def getDocumentNames(self, collection_name):
@@ -81,7 +79,8 @@ class dbQueryManager(object):
         ])
         return dbQueryManager.__cursorToMap(resultCursor)
 
-    def getBagsByDateDistance(self, collection_name, date, direction):
+    def getBagsByDateDistance(self, collection_name, bagIds, date, direction):
+        bagIds = map(ObjectId, bagIds)
         if direction == "more":
             cmper = "$gte"
         if direction == "less":
@@ -89,11 +88,25 @@ class dbQueryManager(object):
         if direction == "exactly":
             cmper = "$eq"
         collection = self.db[collection_name]
-        resultCursor = collection.find({
-            "date_creation": {
-                cmper: date
-            }
-        })
+        
+        resultCursor = collection.aggregate([{
+                "$match": {
+                    "_id": {
+                        "$in": bagIds
+                    }
+                }
+            }, {
+                "$match": {
+                    "date_creation": {
+                        cmper: date
+                    }
+                }
+        }])
+        # resultCursor = collection.find({
+        #     "date_creation": {
+        #         cmper: date
+        #     }
+        # })
         # return dbQueryManager.__cursorToMap(resultCursor)
         return self.tmpGetDict(resultCursor)
 
@@ -287,7 +300,7 @@ if __name__ == "__main__":
     # lel = manager.getBagsByTopics(collection, ["/chatter"])
     # lel = manager.getBagsByMsgsNumber(collection, 9, 1000)
     date = datetime.datetime(2019, 11, 10, 0,0,0,0)
-    lel = manager.getBagsByDateDistance(collection, date, "more")
+    # lel = manager.getBagsByDateDistance(collection, date, "more")
 
     
     # print(manager.getNumberOfMsgs(collection))
@@ -295,7 +308,7 @@ if __name__ == "__main__":
     # kek = [elem["_id"] for elem in kek]
     # print(kek)
 
-    for bag in lel.values():
-        print(bag["filename"])
+    # for bag in lel.values():
+    #     print(bag["filename"])
     
 

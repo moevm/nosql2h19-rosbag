@@ -18,18 +18,6 @@ var WindowFilterDate = {
                 timepicker: false,
                 label: "Основная дата:",
                 labelWidth: 170,
-                minDate:"2016-05-07",
-                // suggest:{ 
-                //     type:"calendar", body:{ 
-                //       timepicker:true, 
-                //       on:{ 
-                //         "onBeforeDateSelect":function(data,root){
-                //             console.log(root);
-                //             if (data.getDate() < 15) return false;
-                //           }
-                //          }
-                //     }
-                //   }
             },
             {
                 id: "dirChooser",
@@ -51,7 +39,6 @@ var WindowFilterDate = {
                 view: "button",
                 label: "Отфильтровать",
                 click: function() {
-                    // TODO ограничение видимости дат для существующих файлов
                     selectedDate = $$("dateChooser").getValue();
                     selectedDirID = $$("dirChooser").getValue();
                     console.log(selectedDate, selectedDirID)
@@ -61,6 +48,7 @@ var WindowFilterDate = {
                         return
                     }
                     tableManager.updateMainTableByRequest("/getFilterData", {
+                        ids: tableManager.getCurrentIdsFromMainTable(),
                         filterItem: "date",
                         date: selectedDate,
                         dir: convertIDtoDir(selectedDirID)
