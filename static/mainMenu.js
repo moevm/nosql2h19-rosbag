@@ -18,8 +18,8 @@ var MainMenu = {
             id: "filterByTopics",
             value: "Топикам"
         }, {
-            id: "filterBySize",
-            value: "Размеру"
+            id: "filterByDuration",
+            value: "Времени записи"
         }]
     },{
         id: "stats",
@@ -33,25 +33,42 @@ var MainMenu = {
 
             if (id == "filterByDate") {
                 let currentIds = tableManager.getCurrentIdsFromMainTable()
-                console.log(currentIds)
                 
                 webix.ajax("/getMaxMinDatesByIds", {
                     "ids": currentIds
                 }, function(result) {
                     result = JSON.parse(result)
-                    console.log(result)
                     let minDate = new Date(result['min'])
                     minDate.setDate(minDate.getDate() - 1)
                     let maxDate = new Date(result['max'])
                     maxDate.setDate(maxDate.getDate() + 1)
+
                     $$("dateChooser").getPopup().getBody().define("minDate", minDate);
                     $$("dateChooser").getPopup().getBody().define("maxDate", maxDate);
-                    $$("dateChooser").refresh();
+
                     $$("windowFilterDate").show()
                 })
             }
-            if (id == "filterBySize"){
-                $$("windowFilterDuration").show()
+            if (id == "filterByDuration"){
+                let currentIds = tableManager.getCurrentIdsFromMainTable()
+                webix.ajax("/getMaxMinDurationsByIds", {
+                    "ids": currentIds
+                }, function(result) {
+                    result = JSON.parse(result)
+                    console.log(result)
+                    let minDur = Math.round(result['min']) - 1
+                    let maxDur = Math.round(result['max']) + 1
+                    console.log(minDur, maxDur)
+
+                    $$("valueSlider").define("min", minDur)
+                    $$("valueSlider").define("max", maxDur)
+                    let avg = Math.floor((maxDur - minDur) / 2)
+                    $$("valueSlider").setValue(avg)
+                    $$("valueOutput").setValue(avg)
+                    
+                    $$("windowFilterDuration").show()
+                })
+
             }
 
             if (id == "stats") {

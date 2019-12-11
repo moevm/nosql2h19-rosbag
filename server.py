@@ -86,6 +86,13 @@ def getMaxMinDatesByIds():
     ans = DB.getMaxMinDatesByIds(defaultCollection, bagIds)
     return make_response(jsonify(ans), 200)
 
+@app.route("/getMaxMinDurationsByIds", methods=['GET'])
+def getMaxMinDurationsByIds():
+    bagIds = json.loads(request.args.get('ids'))
+    print("Requestes ids:", bagIds)
+    ans = DB.getMaxMinDurationsByIds(defaultCollection, bagIds)
+    return make_response(jsonify(ans), 200)
+
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = set(['bag'])
     return '.' in filename and \

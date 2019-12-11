@@ -220,7 +220,6 @@ class dbQueryManager(object):
 
     def getMaxMinDatesByIds(self, collection_name, bagIds):
         bagIds = map(ObjectId, bagIds)
-        print("query: ", bagIds)
         collection = self.db[collection_name]
         ans = collection.aggregate([{
                 "$match": {
@@ -243,6 +242,29 @@ class dbQueryManager(object):
         del ans["_id"]
         return ans
 
+    def getMaxMinDurationsByIds(self, collection_name, bagIds):
+        bagIds = map(ObjectId, bagIds)
+        collection = self.db[collection_name]
+        ans = collection.aggregate([{
+                "$match": {
+                    "_id": {
+                        "$in": bagIds
+                    }
+                }
+            }, {
+                "$group": {
+                    "_id": "null",
+                    "max": {
+                        "$max": "$duration"
+                    },
+                    "min": {
+                        "$min": "$duration"
+                    }
+                }
+        }])
+        ans = list(ans)[0]
+        del ans["_id"]
+        return ans
 
     @staticmethod
     def __cursorToMap(iterableOfMaps):
