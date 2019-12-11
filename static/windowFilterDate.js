@@ -17,7 +17,19 @@ var WindowFilterDate = {
                 stringResult: true,
                 timepicker: false,
                 label: "Основная дата:",
-                labelWidth: 170
+                labelWidth: 170,
+                minDate:"2016-05-07",
+                // suggest:{ 
+                //     type:"calendar", body:{ 
+                //       timepicker:true, 
+                //       on:{ 
+                //         "onBeforeDateSelect":function(data,root){
+                //             console.log(root);
+                //             if (data.getDate() < 15) return false;
+                //           }
+                //          }
+                //     }
+                //   }
             },
             {
                 id: "dirChooser",

@@ -40,9 +40,15 @@ var MainMenu = {
                 }, function(result) {
                     result = JSON.parse(result)
                     console.log(result)
-                    
+                    let minDate = new Date(result['min'])
+                    minDate.setDate(minDate.getDate() - 1)
+                    let maxDate = new Date(result['max'])
+                    maxDate.setDate(maxDate.getDate() + 1)
+                    $$("dateChooser").getPopup().getBody().define("minDate", minDate);
+                    $$("dateChooser").getPopup().getBody().define("maxDate", maxDate);
+                    $$("dateChooser").refresh();
+                    $$("windowFilterDate").show()
                 })
-                $$("windowFilterDate").show()
             }
             if (id == "filterBySize"){
                 $$("windowFilterDuration").show()
