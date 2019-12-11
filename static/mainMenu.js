@@ -32,6 +32,16 @@ var MainMenu = {
             }
 
             if (id == "filterByDate") {
+                let currentIds = tableManager.getCurrentIdsFromMainTable()
+                console.log(currentIds)
+                
+                webix.ajax("/getMaxMinDatesByIds", {
+                    "ids": currentIds
+                }, function(result) {
+                    result = JSON.parse(result)
+                    console.log(result)
+                    
+                })
                 $$("windowFilterDate").show()
             }
             if (id == "filterBySize"){

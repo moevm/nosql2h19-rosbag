@@ -208,7 +208,7 @@ class dbQueryManager(object):
                 "$match": {
                     "_id": ObjectId(bagId)
                 }
-            },{
+            }, {
                 "$project": {
                     "msgs_num": "$topics_list.msgs_num",
                     "msgs_type": "$topics_list.msgs_type",
@@ -217,6 +217,31 @@ class dbQueryManager(object):
             }
         ])
         return self.tmpGetDict(ans)
+
+    def getMaxMinDatesByIds(self, collection_name, bagIds):
+        bagIds = map(ObjectId, bagIds)
+        print("query: ", bagIds)
+        collection = self.db[collection_name]
+        ans = collection.aggregate([{
+                "$match": {
+                    "_id": {
+                        "$in": bagIds
+                    }
+                }
+            }, {
+                "$group": {
+                    "_id": "null",
+                    "max": {
+                        "$max": "$date_creation"
+                    },
+                    "min": {
+                        "$min": "$date_creation"
+                    }
+                }
+        }])
+        ans = list(ans)[0]
+        del ans["_id"]
+        return ans
 
 
     @staticmethod

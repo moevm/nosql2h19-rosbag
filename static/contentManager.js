@@ -72,4 +72,13 @@ class contentManager {
         });
     }
     
+
+    getCurrentIdsFromMainTable(){
+        let ids = []
+        $$(`${this.idMainTable}`).eachRow((row) => {
+            ids.push(row)
+        })
+        return ids
+    }
+    
 }

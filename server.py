@@ -6,6 +6,7 @@ import datetime
 import os
 from adapter import getDataFromBag
 import dbQueryManager
+import json
 
 DB = dbQueryManager.dbQueryManager()
 app = Flask(__name__)
@@ -78,10 +79,20 @@ def getTopicsById():
     ans = DB.getTopicsInfoById(defaultCollection, bagId)
     return make_response(jsonify(ans), 200)
 
+@app.route("/getMaxMinDatesByIds", methods=['GET'])
+def getMaxMinDatesByIds():
+    bagIds = json.loads(request.args.get('ids'))
+    print("Requestes ids:", bagIds)
+    ans = DB.getMaxMinDatesByIds(defaultCollection, bagIds)
+    return make_response(jsonify(ans), 200)
+
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = set(['bag'])
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
