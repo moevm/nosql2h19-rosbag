@@ -1,9 +1,13 @@
 class contentManager {
-    constructor(idMainTable, idTopicsTable, idMainMenu, idTopicsMenu){
+    constructor(idMainTable, idTopicsTable, idMsgsTable, idMainMenu, idTopicsMenu, idMsgsMenu){
         this.idMainTable = idMainTable
         this.idTopicsTable = idTopicsTable
+        this.idMsgsTable = idMsgsTable
+
         this.idMainMenu = idMainMenu
         this.idTopicsMenu = idTopicsMenu
+        this.idMsgsMenu = idMsgsMenu
+
         this.activeTable = idMainTable
         this.activeMenu = idMainMenu
     }
@@ -24,6 +28,15 @@ class contentManager {
         $$(`${this.idTopicsMenu}`).show()
         this.activeTable = this.idTopicsTable
         this.activeMenu = this.idTopicsMenu
+    }
+
+    showMsgsTable(){
+        $$(`${this.activeTable}`).hide()
+        $$(`${this.activeMenu}`).hide()
+        $$(`${this.idMsgsTable}`).show()
+        $$(`${this.idMsgsMenu}`).show()
+        this.activeTable = this.idMsgsTable
+        this.activeMenu = this.idMsgsMenu
     }
 
     updateMainTableByRequest(requestString, requestData){

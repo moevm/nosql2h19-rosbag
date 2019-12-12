@@ -1,6 +1,6 @@
-var TopicsTable = {
+var MsgsTable = {
+    "id": "msgsTable",
     "view": "datatable",
-    "id": "topicsTable",
     "select": true,
     "scrollX": false,
     "fixedRowHeight": false,
@@ -11,41 +11,27 @@ var TopicsTable = {
     "hidden": true,
 
     "columns": [{
-        id: "topic_name",
-        "header": "Название топика",
+        id: "msgs_name",
+        "header": "Название",
         "fillspace": true,
         "sort": "string",
         "hidden": false,
     }, {
         id: "msgs_type",
-        "header": "Типы сообщений",
+        "header": "Тип",
         "sort": "string",
         "fillspace": true,
         "hidden": false
     }, {
-        id: "msgs_num",
-        "header": "Количество сообщений",
-        "sort": "string",
-        "fillspace": true,
-        "hidden": false,
-    }, {
         id: "msgs_list",
-        "header": "Список сообщений",
+        "header": "Показать сообщения",
         "sort": "string",
         "fillspace": true,
         "hidden": false,
         template: function(obj) {
-            return "<button class='callMsgsBtn'>Показать сообщения!</button>";
-        },
-    }],
-    onClick: {
-        callMsgsBtn: function(event, cell, target) {
-            tableManager.showMsgsTable()
-            // tableManager.updateTopicsTableByRequest("/getTopicsInfoById", {
-            //     id: cell["row"]
-            // });
+            return "<button class='webixtype_base'>Показать сообщения</button>";
         }
-    },
+    }],
     on: {
         onBeforeLoad: function() {
             this.showOverlay("Loading...");
