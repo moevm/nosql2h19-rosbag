@@ -21,10 +21,14 @@ var MainMenu = {
             id: "filterByDuration",
             value: "Времени записи"
         }]
-    },{
+    }, {
         id: "stats",
-        value: "Статистика"
-    }], // TODO добавить кнопку сбросить
+        value: "Статистика",
+    }, {
+        id: "mainClear",
+        value: "Убрать фильтры"
+
+    }],
     on: {
         onMenuItemClick: function(id) {
             if (id == "chooseUpload") {
@@ -49,6 +53,31 @@ var MainMenu = {
                     $$("windowFilterDate").show()
                 })
             }
+
+            if (id == "filterByTopics"){
+                let currentIds = tableManager.getCurrentIdsFromMainTable()
+
+                webix.ajax("/getTopicsByIds", {
+                    "ids": currentIds
+                }, function(result) {
+                    let topics = JSON.parse(result)['topics']
+                    $$("listOfTopics").clearAll()
+                    topics.forEach(topic => {
+                        $$("listOfTopics").add({title: topic})
+                    });
+                    // let minDate = new Date(result['min'])
+                    // minDate.setDate(minDate.getDate() - 1)
+                    // let maxDate = new Date(result['max'])
+                    // maxDate.setDate(maxDate.getDate() + 1)
+
+                    // $$("dateChooser").getPopup().getBody().define("minDate", minDate);
+                    // $$("dateChooser").getPopup().getBody().define("maxDate", maxDate);
+
+                    $$("windowFilterTopics").show()
+                })
+            }
+
+
             if (id == "filterByDuration"){
                 let currentIds = tableManager.getCurrentIdsFromMainTable()
                 webix.ajax("/getMaxMinDurationsByIds", {
@@ -73,20 +102,17 @@ var MainMenu = {
             }
 
             if (id == "stats") {
-                // $$("mainTable").hide()
-                // $$("mainTable_2").show()
-                // webix.ajax("/getStats", function(result) {
-                //     result = JSON.parse(result)
-                //     let text = ""
-                //     for (var id in result) {
-                //         text = text + result[id]["sum"] + "\n"
-                //     }
-                //     webix.alert({
-                //         title: "Сумма значений топика quaternionTopic сообщений X",
-                //         width: 400,
-                //         text: text
-                //     });
-                // })
+                
+            }
+
+            if (id == "mainClear"){
+                // todo check this
+                let my_promise = new Promise(function(resolve) {
+                    setTimeout(function() {
+                        resolve(tableManager.updateMainTableByRequest("/getFaceData"))
+                    }, 1000)
+                });
+                my_promise.then(tableManager.deactivateClearMainMenuItem())
             }
         },
     }

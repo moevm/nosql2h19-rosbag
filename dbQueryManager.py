@@ -66,18 +66,21 @@ class dbQueryManager(object):
         )
         return dbQueryManager.__cursorToMap(resultCursor)
 
-    def getBagsByTopics(self, collection_name, topics):
+    def getBagsByTopics(self, collection_name, bagIds, topics):
+        bagIds = map(ObjectId, bagIds)
         collection = self.db[collection_name]
         resultCursor = collection.aggregate([
             {
                 "$match": {
+                    "_id": { "$in": bagIds },
                     "topics_list.topic_name": {
                         "$in": topics
                     }
                 }
             }
         ])
-        return dbQueryManager.__cursorToMap(resultCursor)
+        return self.tmpGetDict(resultCursor)
+        # return dbQueryManager.__cursorToMap(resultCursor)
 
     def getBagsByDateDistance(self, collection_name, bagIds, date, direction):
         bagIds = map(ObjectId, bagIds)
@@ -242,6 +245,32 @@ class dbQueryManager(object):
             }
         ])
         return self.tmpGetDict(ans)
+
+    def getTopicsByIds(self, collection_name, bagIds):
+        bagIds = map(ObjectId, bagIds)
+        collection = self.db[collection_name]    
+        ans = collection.aggregate([{
+                "$match": {
+                    "_id": {
+                        "$in": bagIds
+                    }
+                }
+            }, {
+                "$project": {
+                    "topic_names": "$topics_list.topic_name",
+                }
+            },
+            {
+                "$unwind": "$topic_names"
+            },
+            {
+                "$group": {
+                    "_id": "$topic_names",
+                }
+            }
+        ])
+        ans = [x['_id'] for x in list(ans)]
+        return ans  
 
     def getMaxMinDatesByIds(self, collection_name, bagIds):
         bagIds = map(ObjectId, bagIds)

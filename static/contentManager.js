@@ -71,6 +71,22 @@ class contentManager {
             }
         });
     }
+
+    activateClearMainMenuItem(){
+        $$(`${this.idMainMenu}`).enableItem("mainClear")
+    }
+
+    deactivateClearMainMenuItem(){
+        $$(`${this.idMainMenu}`).disableItem("mainClear")
+    }
+
+    activateClearTopicsMenuItem(){
+        $$(`${this.idTopicsMenu}`).enableItem("topicsClear")
+    }
+
+    deactivateClearTopicsMenuItem(){
+        $$(`${this.idTopicsMenu}`).disableItem("topicsClear")
+    }
     
 
     getCurrentIdsFromMainTable(){

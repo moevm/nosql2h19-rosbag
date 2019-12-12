@@ -12,18 +12,19 @@ var TopicsMenu = {
         id: "filter",
         value: "Отфильтровать по...",
         submenu: [{
-            id: "filterByDate",
-            value: "Дате"
-        }, {
-            id: "filterByTopics",
+            id: "filterByTopicNames",
             value: "Топикам"
         }, {
-            id: "filterBySize",
-            value: "Размеру"
+            id: "filterByMsgsType",
+            value: "Типу сообщений"
+        }, {
+            id: "filterByMsgsNum",
+            value: "Количеству сообщений"
         }]
-    },{
-        id: "stats",
-        value: "Статистика"
+    }, {
+        id: "topicsClear",
+        value: "Убрать фильтры"
+
     }],
     on: {
         onMenuItemClick: function(id) {
@@ -31,29 +32,25 @@ var TopicsMenu = {
                 tableManager.showMainTable()
             }
 
-            if (id == "filterByDate") {
-                $$("windowFilterDate").show()
+            if (id == "filterByTopicNames") {
+                // $$("windowFilterDate").show()
+                tableManager.activateClearTopicsMenuItem()
             }
-            if (id == "filterBySize"){
-                $$("windowFilterDuration").show()
+            if (id == "filterByMsgsType"){
+
+                tableManager.activateClearTopicsMenuItem()
+            }
+            if (id == "filterByMsgsNum"){
+
+                tableManager.activateClearTopicsMenuItem()
             }
 
-            if (id == "stats") {
-                // $$("mainTable").hide()
-                // $$("mainTable_2").show()
-                // webix.ajax("/getStats", function(result) {
-                //     result = JSON.parse(result)
-                //     let text = ""
-                //     for (var id in result) {
-                //         text = text + result[id]["sum"] + "\n"
-                //     }
-                //     webix.alert({
-                //         title: "Сумма значений топика quaternionTopic сообщений X",
-                //         width: 400,
-                //         text: text
-                //     });
-                // })
+
+            if (id == "topicsClear"){
+                // load face topic data
+                tableManager.deactivateClearTopicsMenuItem()
             }
+
         },
     }
 }

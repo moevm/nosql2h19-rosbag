@@ -73,6 +73,7 @@ var WindowFilterDuration = {
                         duration: selectedDuration,
                         dir: convertIDtoDir(selectedDirID)
                     });
+                    tableManager.activateClearMainMenuItem()
                     this.getParentView().getParentView().hide()
                 }
             }
