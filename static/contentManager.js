@@ -71,6 +71,15 @@ class contentManager {
             }
         });
     }
+
+    activateClearMainMenuItem(){
+        $$(`${this.idMainMenu}`).enableItem("mainClear")
+    }
+
+    deactivateClearMainMenuItem(){
+        $$(`${this.idMainMenu}`).disableItem("mainClear")
+    }
+
     
 
     getCurrentIdsFromMainTable(){

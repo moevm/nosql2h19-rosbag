@@ -53,6 +53,7 @@ var WindowFilterDate = {
                         date: selectedDate,
                         dir: convertIDtoDir(selectedDirID)
                     });
+                    tableManager.activateClearMainMenuItem()
                     this.getParentView().getParentView().hide()
                 }
             }

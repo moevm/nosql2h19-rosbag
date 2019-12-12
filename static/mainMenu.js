@@ -21,10 +21,14 @@ var MainMenu = {
             id: "filterByDuration",
             value: "Времени записи"
         }]
-    },{
+    }, {
         id: "stats",
-        value: "Статистика"
-    }], // TODO добавить кнопку сбросить
+        value: "Статистика",
+    }, {
+        id: "mainClear",
+        value: "Убрать фильтры"
+
+    }],
     on: {
         onMenuItemClick: function(id) {
             if (id == "chooseUpload") {
@@ -73,20 +77,17 @@ var MainMenu = {
             }
 
             if (id == "stats") {
-                // $$("mainTable").hide()
-                // $$("mainTable_2").show()
-                // webix.ajax("/getStats", function(result) {
-                //     result = JSON.parse(result)
-                //     let text = ""
-                //     for (var id in result) {
-                //         text = text + result[id]["sum"] + "\n"
-                //     }
-                //     webix.alert({
-                //         title: "Сумма значений топика quaternionTopic сообщений X",
-                //         width: 400,
-                //         text: text
-                //     });
-                // })
+                
+            }
+
+            if (id == "mainClear"){
+                // todo check this
+                let my_promise = new Promise(function(resolve) {
+                    setTimeout(function() {
+                        resolve(tableManager.updateMainTableByRequest("/getFaceData"))
+                    }, 1000)
+                });
+                my_promise.then(tableManager.deactivateClearMainMenuItem())
             }
         },
     }
