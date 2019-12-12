@@ -80,6 +80,13 @@ class contentManager {
         $$(`${this.idMainMenu}`).disableItem("mainClear")
     }
 
+    activateClearTopicsMenuItem(){
+        $$(`${this.idTopicsMenu}`).enableItem("topicsClear")
+    }
+
+    deactivateClearTopicsMenuItem(){
+        $$(`${this.idTopicsMenu}`).disableItem("topicsClear")
+    }
     
 
     getCurrentIdsFromMainTable(){
