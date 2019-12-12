@@ -6,6 +6,7 @@ import datetime
 import os
 from adapter import getDataFromBag
 import dbQueryManager
+import json
 
 DB = dbQueryManager.dbQueryManager()
 app = Flask(__name__)
@@ -32,24 +33,25 @@ def getFaceData():
 
 @app.route('/getFilterData', methods=['GET'])
 def getFilterData():
+    # TODO error "exactly" not working correctly
     filterItem = request.args.get('filterItem')
-    if (filterItem == "date"):
-        direction = request.args.get('dir')
-        date = request.args.get('date')
-        date = datetime.datetime.strptime(date, "%Y-%m-%d %X")
-        ans = ""
+    bagIds = json.loads(request.args.get('ids'))
+    ans = ""
 
-        if direction == "exactly":
-            ans = DB.getBagsByDateDistance(defaultCollection, date, "exactly")
-        if direction == "more":
-            ans = DB.getBagsByDateDistance(defaultCollection, date, "more")
-        if direction == "less":
-            ans = DB.getBagsByDateDistance(defaultCollection, date, "less")
+    if not bagIds:
+        return make_response(jsonify("No ids to filter"), 200)    
+    
+    if filterItem == "date":
+        date = datetime.datetime.strptime(request.args.get('date'), "%Y-%m-%d %X")
+        direction = request.args.get('dir')
+        if direction in ["exactly", "more", "less"]:
+            ans = DB.getBagsByDateDistance(defaultCollection, bagIds, date, direction)
     
     if filterItem == "duration":
         duration = request.args.get('duration')
-        print(duration)
-        ans = DB.getBagsByDuration(defaultCollection, 0, duration)
+        direction = request.args.get('dir')
+        if direction in ["exactly", "more", "less"]:
+            ans = DB.getBagsByDuration(defaultCollection, bagIds, duration, direction)
     return make_response(jsonify(ans), 200)
 
 @app.route('/getStats', methods=['GET'])
@@ -78,10 +80,25 @@ def getTopicsById():
     ans = DB.getTopicsInfoById(defaultCollection, bagId)
     return make_response(jsonify(ans), 200)
 
+@app.route("/getMaxMinDatesByIds", methods=['GET'])
+def getMaxMinDatesByIds():
+    bagIds = json.loads(request.args.get('ids'))
+    ans = DB.getMaxMinDatesByIds(defaultCollection, bagIds)
+    return make_response(jsonify(ans), 200)
+
+@app.route("/getMaxMinDurationsByIds", methods=['GET'])
+def getMaxMinDurationsByIds():
+    bagIds = json.loads(request.args.get('ids'))
+    ans = DB.getMaxMinDurationsByIds(defaultCollection, bagIds)
+    return make_response(jsonify(ans), 200)
+
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = set(['bag'])
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

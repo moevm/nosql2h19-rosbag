@@ -17,10 +17,10 @@ var WindowFilterDate = {
                 stringResult: true,
                 timepicker: false,
                 label: "Основная дата:",
-                labelWidth: 170
+                labelWidth: 170,
             },
             {
-                id: "dirChooser",
+                id: "dirDateChooser",
                 view: "select",
                 label: "Направление поиска:",
                 labelWidth: 170,
@@ -39,9 +39,8 @@ var WindowFilterDate = {
                 view: "button",
                 label: "Отфильтровать",
                 click: function() {
-                    // TODO ограничение видимости дат для существующих файлов
                     selectedDate = $$("dateChooser").getValue();
-                    selectedDirID = $$("dirChooser").getValue();
+                    selectedDirID = $$("dirDateChooser").getValue();
                     console.log(selectedDate, selectedDirID)
 
                     if (selectedDate == null){
@@ -49,6 +48,7 @@ var WindowFilterDate = {
                         return
                     }
                     tableManager.updateMainTableByRequest("/getFilterData", {
+                        ids: tableManager.getCurrentIdsFromMainTable(),
                         filterItem: "date",
                         date: selectedDate,
                         dir: convertIDtoDir(selectedDirID)
