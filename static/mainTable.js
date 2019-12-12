@@ -41,7 +41,7 @@ var MainTable = {
     onClick: {
         callTopicsBtn: function(event, cell, target) {
             tableManager.showTopicsTable();
-            tableManager.updateTopicsTableByRequest("/getTopicsById", {
+            tableManager.updateTopicsTableByRequest("/getTopicsInfoById", {
                 id: cell["row"]
             });
         }

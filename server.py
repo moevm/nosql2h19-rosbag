@@ -52,7 +52,15 @@ def getFilterData():
         direction = request.args.get('dir')
         if direction in ["exactly", "more", "less"]:
             ans = DB.getBagsByDuration(defaultCollection, bagIds, duration, direction)
+    
+    if filterItem == "topics":
+        topics = json.loads(request.args.get('topics'))
+        ans = DB.getBagsByTopics(defaultCollection, bagIds, topics)
+    
     return make_response(jsonify(ans), 200)
+
+
+
 
 @app.route('/getStats', methods=['GET'])
 def getStats():
@@ -73,11 +81,18 @@ def uploadBags():
                 os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
     return make_response(jsonify({"status": "error"}), 200)
 
-@app.route("/getTopicsById", methods=['GET'])
-def getTopicsById():
+@app.route("/getTopicsInfoById", methods=['GET'])
+def getTopicsInfoById():
     bagId = request.args.get('id')
     print(bagId)
     ans = DB.getTopicsInfoById(defaultCollection, bagId)
+    return make_response(jsonify(ans), 200)
+
+@app.route("/getTopicsByIds", methods=['GET'])
+def getTopicsByIds():
+    bagIds = json.loads(request.args.get('ids'))
+    ans = DB.getTopicsByIds(defaultCollection, bagIds)
+    ans = {"topics": ans}
     return make_response(jsonify(ans), 200)
 
 @app.route("/getMaxMinDatesByIds", methods=['GET'])

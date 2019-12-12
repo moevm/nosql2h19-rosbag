@@ -55,18 +55,24 @@ var MainMenu = {
             }
 
             if (id == "filterByTopics"){
+                let currentIds = tableManager.getCurrentIdsFromMainTable()
+
                 webix.ajax("/getTopicsByIds", {
                     "ids": currentIds
                 }, function(result) {
-                    result = JSON.parse(result)
-                    let minDate = new Date(result['min'])
-                    minDate.setDate(minDate.getDate() - 1)
-                    let maxDate = new Date(result['max'])
-                    maxDate.setDate(maxDate.getDate() + 1)
+                    let topics = JSON.parse(result)['topics']
+                    $$("listOfTopics").clearAll()
+                    topics.forEach(topic => {
+                        $$("listOfTopics").add({title: topic})
+                    });
+                    // let minDate = new Date(result['min'])
+                    // minDate.setDate(minDate.getDate() - 1)
+                    // let maxDate = new Date(result['max'])
+                    // maxDate.setDate(maxDate.getDate() + 1)
 
-                    $$("dateChooser").getPopup().getBody().define("minDate", minDate);
-                    $$("dateChooser").getPopup().getBody().define("maxDate", maxDate);
-)
+                    // $$("dateChooser").getPopup().getBody().define("minDate", minDate);
+                    // $$("dateChooser").getPopup().getBody().define("maxDate", maxDate);
+
                     $$("windowFilterTopics").show()
                 })
             }

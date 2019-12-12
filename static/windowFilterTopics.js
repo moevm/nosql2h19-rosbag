@@ -19,30 +19,30 @@ var WindowFilterTopics = {
                 select: true,
                 multiselect: true,
                 multiselect: "touch",
-                data:[
-                  { id:1, title:"Item 1"},
-                  { id:2, title:"Item 2"},
-                  { id:3, title:"Item 3"}
-                ]
+                scroll: false
             },
             {
                 view: "button",
                 label: "Отфильтровать",
                 click: function() {
-                    // selectedDate = $$("dateChooser").getValue();
-                    // selectedDirID = $$("dirDateChooser").getValue();
-                    // console.log(selectedDate, selectedDirID)
+                    let topics = $$("listOfTopics").getSelectedItem()
+                    if (topics == undefined){
+                        webix.alert("Вы не выбрали ни одного топика!")
+                        return;
+                    }
 
-                    // if (selectedDate == null){
-                    //     webix.alert("Вы не выбрали дату!")
-                    //     return
-                    // }
-                    // tableManager.updateMainTableByRequest("/getFilterData", {
-                    //     ids: tableManager.getCurrentIdsFromMainTable(),
-                    //     filterItem: "date",
-                    //     date: selectedDate,
-                    //     dir: convertIDtoDir(selectedDirID)
-                    // });
+                    if (!Array.isArray(topics))
+                        topics = [topics]
+                    topics = topics.map((id) => {
+                        return id['title']
+                    })
+                    console.log(topics)
+
+                    tableManager.updateMainTableByRequest("/getFilterData", {
+                        ids: tableManager.getCurrentIdsFromMainTable(),
+                        filterItem: "topics",
+                        topics: topics
+                    });
                     tableManager.activateClearMainMenuItem()
                     this.getParentView().getParentView().hide()
                 }
