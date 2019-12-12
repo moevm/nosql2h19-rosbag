@@ -62,6 +62,7 @@ var MainMenu = {
 
                     $$("valueSlider").define("min", minDur)
                     $$("valueSlider").define("max", maxDur)
+                    $$("valueSlider").define("title", `От ${minDur} до ${maxDur}`)
                     let avg = Math.floor((maxDur - minDur) / 2)
                     $$("valueSlider").setValue(avg)
                     $$("valueOutput").setValue(avg)

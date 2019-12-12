@@ -93,10 +93,7 @@ class dbQueryManager(object):
                 "$match": {
                     "_id": {
                         "$in": bagIds
-                    }
-                }
-            }, {
-                "$match": {
+                    },
                     "date_creation": {
                         cmper: date
                     }

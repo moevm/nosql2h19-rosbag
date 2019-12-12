@@ -38,10 +38,10 @@ var WindowFilterDuration = {
                     value: "Ровно",
                     id: 0
                 }, {
-                    value: "Больше",
+                    value: "Более чем",
                     id: 1
                 }, {
-                    value: "Меньше",
+                    value: "Менее чем",
                     id: 2
                 }]
             },
@@ -56,8 +56,6 @@ var WindowFilterDuration = {
                 on: {
                     onChange: function() {
                         $$("valueOutput").setValue(this.getValue())
-                        selectedDirID = $$("dirDateChooser").getValue();
-                        // this.define("title", "Final value " + this.getValue());
                         this.refresh();
                     },
                 }
