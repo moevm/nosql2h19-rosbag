@@ -20,7 +20,7 @@ var WindowFilterDate = {
                 labelWidth: 170,
             },
             {
-                id: "dirChooser",
+                id: "dirDateChooser",
                 view: "select",
                 label: "Направление поиска:",
                 labelWidth: 170,
@@ -40,7 +40,7 @@ var WindowFilterDate = {
                 label: "Отфильтровать",
                 click: function() {
                     selectedDate = $$("dateChooser").getValue();
-                    selectedDirID = $$("dirChooser").getValue();
+                    selectedDirID = $$("dirDateChooser").getValue();
                     console.log(selectedDate, selectedDirID)
 
                     if (selectedDate == null){

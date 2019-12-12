@@ -16,7 +16,7 @@ var WindowFilterDuration = {
                 id: "valueOutput",
                 view: "text",
                 value: '80',
-                label: "Длительность",
+                label: "Длительность:",
                 labelWidth: 120,
                 width: 400,
                 attributes: {
@@ -30,6 +30,22 @@ var WindowFilterDuration = {
                 }
             },
             {
+                id: "dirDurationChooser",
+                view: "select",
+                label: "Направление:",
+                labelWidth: 120,
+                options: [{
+                    value: "Ровно",
+                    id: 0
+                }, {
+                    value: "Больше",
+                    id: 1
+                }, {
+                    value: "Меньше",
+                    id: 2
+                }]
+            },
+            {
                 id: "valueSlider",
                 view: "slider",
                 align: "center",
@@ -40,6 +56,7 @@ var WindowFilterDuration = {
                 on: {
                     onChange: function() {
                         $$("valueOutput").setValue(this.getValue())
+                        selectedDirID = $$("dirDateChooser").getValue();
                         // this.define("title", "Final value " + this.getValue());
                         this.refresh();
                     },
@@ -50,15 +67,27 @@ var WindowFilterDuration = {
                 label: "Отфильтровать",
                 click: function() {
                     selectedDuration = $$("valueOutput").getValue();
-                    console.log(selectedDuration)
+                    selectedDirID = $$("dirDurationChooser").getValue()
 
                     tableManager.updateMainTableByRequest("/getFilterData", {
+                        ids: tableManager.getCurrentIdsFromMainTable(),
                         filterItem: "duration",
                         duration: selectedDuration,
+                        dir: convertIDtoDir(selectedDirID)
                     });
                     this.getParentView().getParentView().hide()
                 }
             }
         ]
     },
+}
+
+function convertIDtoDir(id){
+    if (id == 0)
+        return "exactly"
+    if (id == 1)
+        return "more"
+    if (id == 2)
+        return "less"
+    console.assert("Error id dir")
 }

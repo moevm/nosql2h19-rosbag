@@ -102,17 +102,32 @@ class dbQueryManager(object):
                     }
                 }
         }])
-        # resultCursor = collection.find({
-        #     "date_creation": {
-        #         cmper: date
-        #     }
-        # })
         # return dbQueryManager.__cursorToMap(resultCursor)
         return self.tmpGetDict(resultCursor)
 
-    def getBagsByDuration(self, collection_name, duration_min, duration_max):
-        # TODO
-        return "todo this"
+    def getBagsByDuration(self, collection_name, bagIds, duration, direction):
+        bagIds = map(ObjectId, bagIds)
+        if direction == "more":
+            cmper = "$gte"
+        if direction == "less":
+            cmper = "$lte"
+        if direction == "exactly":
+            cmper = "$eq" # todo особый случай. если 24, то между 24 и 25
+        collection = self.db[collection_name]
+        
+        print("Duration:", float(duration))
+        resultCursor = collection.aggregate([{
+                "$match": {
+                    "_id": {
+                        "$in": bagIds
+                    },
+                    "duration": {
+                        cmper: float(duration)
+                    }
+                }
+        }])
+        # return dbQueryManager.__cursorToMap(resultCursor)
+        return self.tmpGetDict(resultCursor)
 
 
     def getBagsByMsgsNumber(self, collection_name, min_num, max_num):
