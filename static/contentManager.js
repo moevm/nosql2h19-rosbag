@@ -40,6 +40,7 @@ class contentManager {
     }
 
     updateMainTableByRequest(requestString, requestData){
+        console.log("error;", `${this.idMainTable}`)
         $$(`${this.idMainTable}`).clearAll()
         const tableID = this.idMainTable
 
@@ -70,17 +71,52 @@ class contentManager {
             
             for (var key in result) {
                 let topicsNumber = result[key]["topic_name"].length
-                console.log(topicsNumber)
-                console.log(key)
+                // console.log(topicsNumber)
+                // console.log(key)
                 for (var i = 0; i < topicsNumber; i++){
                     console.log(result[key]["topic_name"][i])
                     $$(tableID).add({
-                        id: i,
+                        id: key + "|_|" + result[key]["topic_name"][i],
                         topic_name: result[key]["topic_name"][i],
                         msgs_type: result[key]["msgs_type"][i],
                         msgs_num: result[key]["msgs_num"][i],
                     })
                 }
+            }
+        });
+    }
+
+    updateMsgsTableByRequest(requestString, requestData){
+        $$(`${this.idMsgsTable}`).clearAll()
+        const tableID = this.idMsgsTable
+        console.log("Request data:", requestData)
+        
+        webix.ajax(requestString, requestData, function(result) {
+            result = JSON.parse(result)
+            console.log(result)
+            
+            for (var key in result) { // должен быть один   
+                let msgs = result[key]["msgs_list"]["msgs_list"]
+                console.log(msgs)
+                msgs.forEach(element => {
+                    console.log(element)
+                    $$(tableID).add({
+                        // id: key,
+                        msgs_name: element['msg_name'],
+                        msgs_type: element['msg_type'],
+                        // msgs_list: result[key]["msgs_num"][i],
+                    })   
+                });
+
+                // for (var i = 0; i < topicsNumber; i++){
+                //     console.log(result[key]["topic_name"][i])
+                //     $$(tableID).add({
+                //         id: i,
+                //         topic_name: result[key]["topic_name"][i],
+                //         msgs_type: result[key]["msgs_type"][i],
+                //         msgs_num: result[key]["msgs_num"][i],
+                //     })
+                // }
             }
         });
     }

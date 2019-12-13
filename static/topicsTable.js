@@ -40,10 +40,14 @@ var TopicsTable = {
     }],
     onClick: {
         callMsgsBtn: function(event, cell, target) {
+            let data = cell["row"].split("|_|")
+            let id = data[0]
+            let topic_name = data[1]
             tableManager.showMsgsTable()
-            // tableManager.updateTopicsTableByRequest("/getTopicsInfoById", {
-            //     id: cell["row"]
-            // });
+            tableManager.updateMsgsTableByRequest("/getMsgsInfoByIdAndTopicName", {
+                id: id,
+                topic_name: topic_name
+            });
         }
     },
     on: {
