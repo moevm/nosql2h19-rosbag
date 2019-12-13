@@ -90,11 +90,11 @@ class contentManager {
             
             for (var key in result) { // должен быть один   
                 let msgs = result[key]["msgs_list"]["msgs_list"]
-                console.log(msgs)
+
                 msgs.forEach(element => {
                     console.log(element)
                     $$(tableID).add({
-                        id: requestData["id"] + "|_|" + requestData["topic_name"] + "|_|" + element['msg_name']
+                        id: requestData["id"] + "|_|" + requestData["topic_name"] + "|_|" + element['msg_name'],
                         msgs_name: element['msg_name'],
                         msgs_type: element['msg_type'],
                     })   
