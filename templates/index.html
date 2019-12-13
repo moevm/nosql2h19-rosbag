@@ -18,22 +18,26 @@
 <script src="../static/windowFilterDuration.js" type="text/javascript"></script>
 <script src="../static/contentManager.js" type="text/javascript"></script>
 <script src="../static/windowFilterTopics.js" type="text/javascript"></script>
+<script src="../static/msgsMenu.js" type="text/javascript"></script>
+<script src="../static/msgsTable.js" type="text/javascript"></script>
+<script src="../static/windowShowMsgs.js" type="text/javascript"></script>
 
 
 <title>Hello from Flask</title>
 <body>
 <script type="text/javascript" charset="utf-8">
-    const tableManager = new contentManager(MainTable["id"], TopicsTable["id"], MainMenu["id"], TopicsMenu["id"])
+    const tableManager = new contentManager(MainTable["id"], TopicsTable["id"], MsgsTable["id"], MainMenu["id"], TopicsMenu["id"], MsgsMenu["id"])
     webix.i18n.setLocale("ru-RU");
     webix.ready(function() {
         webix.ui(WindowUpload)
         webix.ui(WindowFilterDate)
         webix.ui(WindowFilterDuration)
         webix.ui(WindowFilterTopics)
+        webix.ui(WindowShowMsgs)
         webix.ui({
             "rows": [Header, {
                 "type": "wide",
-                "cols": [MainMenu, TopicsMenu, MainTable, TopicsTable]
+                "cols": [MainMenu, TopicsMenu, MsgsMenu, MainTable, TopicsTable, MsgsTable]
             }]
         });
         tableManager.showMainTable()

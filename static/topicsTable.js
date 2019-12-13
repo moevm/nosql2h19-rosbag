@@ -35,9 +35,21 @@ var TopicsTable = {
         "fillspace": true,
         "hidden": false,
         template: function(obj) {
-            return "<div class='webix_el_button'><button class='webixtype_base'>Показать сообщения</button></div>";
-        }
+            return "<button class='callMsgsBtn'>Показать сообщения!</button>";
+        },
     }],
+    onClick: {
+        callMsgsBtn: function(event, cell, target) {
+            let data = cell["row"].split("|_|")
+            let id = data[0]
+            let topic_name = data[1]
+            tableManager.showMsgsTable()
+            tableManager.updateMsgsTableByRequest("/getMsgsInfoByIdAndTopicName", {
+                id: id,
+                topic_name: topic_name
+            });
+        }
+    },
     on: {
         onBeforeLoad: function() {
             this.showOverlay("Loading...");

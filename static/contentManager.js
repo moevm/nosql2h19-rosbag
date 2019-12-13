@@ -1,9 +1,13 @@
 class contentManager {
-    constructor(idMainTable, idTopicsTable, idMainMenu, idTopicsMenu){
+    constructor(idMainTable, idTopicsTable, idMsgsTable, idMainMenu, idTopicsMenu, idMsgsMenu){
         this.idMainTable = idMainTable
         this.idTopicsTable = idTopicsTable
+        this.idMsgsTable = idMsgsTable
+
         this.idMainMenu = idMainMenu
         this.idTopicsMenu = idTopicsMenu
+        this.idMsgsMenu = idMsgsMenu
+
         this.activeTable = idMainTable
         this.activeMenu = idMainMenu
     }
@@ -26,6 +30,15 @@ class contentManager {
         this.activeMenu = this.idTopicsMenu
     }
 
+    showMsgsTable(){
+        $$(`${this.activeTable}`).hide()
+        $$(`${this.activeMenu}`).hide()
+        $$(`${this.idMsgsTable}`).show()
+        $$(`${this.idMsgsMenu}`).show()
+        this.activeTable = this.idMsgsTable
+        this.activeMenu = this.idMsgsMenu
+    }
+
     updateMainTableByRequest(requestString, requestData){
         $$(`${this.idMainTable}`).clearAll()
         const tableID = this.idMainTable
@@ -34,7 +47,6 @@ class contentManager {
             result = JSON.parse(result)
             let i = 0
             for (var key in result) {
-                console.log(key)
                 $$(tableID).parse([{
                     id: key,
                     filename: result[key]["filename"],
@@ -53,21 +65,40 @@ class contentManager {
         
         webix.ajax(requestString, requestData, function(result) {
             result = JSON.parse(result)
-            console.log(result)
             
             for (var key in result) {
                 let topicsNumber = result[key]["topic_name"].length
-                console.log(topicsNumber)
-                console.log(key)
                 for (var i = 0; i < topicsNumber; i++){
-                    console.log(result[key]["topic_name"][i])
                     $$(tableID).add({
-                        id: i,
+                        id: key + "|_|" + result[key]["topic_name"][i],
                         topic_name: result[key]["topic_name"][i],
                         msgs_type: result[key]["msgs_type"][i],
                         msgs_num: result[key]["msgs_num"][i],
                     })
                 }
+            }
+        });
+    }
+
+    updateMsgsTableByRequest(requestString, requestData){
+        $$(`${this.idMsgsTable}`).clearAll()
+        const tableID = this.idMsgsTable
+        
+        webix.ajax(requestString, requestData, function(result) {
+            result = JSON.parse(result)
+            console.log(requestData)
+            
+            for (var key in result) { // должен быть один   
+                let msgs = result[key]["msgs_list"]["msgs_list"]
+
+                msgs.forEach(element => {
+                    console.log(element)
+                    $$(tableID).add({
+                        id: requestData["id"] + "|_|" + requestData["topic_name"] + "|_|" + element['msg_name'],
+                        msgs_name: element['msg_name'],
+                        msgs_type: element['msg_type'],
+                    })   
+                });
             }
         });
     }
