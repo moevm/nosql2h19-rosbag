@@ -1,24 +1,29 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-s
-from flask import Flask, render_template, jsonify, make_response, request, redirect, url_for
-from werkzeug.utils import secure_filename
+from flask import Flask, render_template, jsonify, make_response, request
 import datetime
-import os
-from adapter import getDataFromBag
-import dbQueryManager
 import json
 
-DB = dbQueryManager.dbQueryManager()
+from adapter import getDataFromBag
+
 app = Flask(__name__)
+from up_down_loading import loading_api
+app.register_blueprint(loading_api)
+
+import dbQueryManager
+DB = dbQueryManager.dbQueryManager()
+
 app.config['UPLOAD_FOLDER'] = dbQueryManager.STORAGE_UPLOAD
-defaultCollection = "bagfiles_test"
+app.config["defaultCollection"] = "bagfiles_test"
+defaultCollection = app.config["defaultCollection"]
+
 
 @app.route("/")
 def hello(name=None):
     return render_template('index.html', name=name)
 
-@app.route("/getDocumentsNumber")
-def getDocsData():
+@app.route("/getFilesNumber")
+def getFilesNumber():
     result = DB.getNumberOfDocuments(defaultCollection)
 
     ans = {'status': True, 'result': result}
@@ -67,19 +72,6 @@ def getStats():
     ans = DB.getStats(defaultCollection)
     return make_response(jsonify(ans), 200)
 
-@app.route("/uploadBags", methods=['GET', 'POST'])
-def uploadBags():
-    if request.method == 'POST':
-        file = request.files['upload']
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            status = DB.addFile(defaultCollection, filename)
-            if status:
-                return make_response(jsonify({"status": "server"}), 200)
-            else:
-                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-    return make_response(jsonify({"status": "error"}), 200)
 
 @app.route("/getTopicsInfoById", methods=['GET'])
 def getTopicsInfoById():
@@ -114,13 +106,7 @@ def getMsgsInfoByIdAndTopicName():
     ans = DB.getMsgsInfoByIdAndTopicName(defaultCollection, bagId, topic_name)
     return make_response(jsonify(ans), 200)
 
-def allowed_file(filename):
-    ALLOWED_EXTENSIONS = set(['bag'])
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
-
-
-
 
 if __name__ == '__main__':
     app.run(debug=True)
+    
