@@ -41,7 +41,6 @@ var WindowFilterDate = {
                 click: function() {
                     selectedDate = $$("dateChooser").getValue();
                     selectedDirID = $$("dirDateChooser").getValue();
-                    console.log(selectedDate, selectedDirID)
 
                     if (selectedDate == null){
                         webix.alert("Вы не выбрали дату!")

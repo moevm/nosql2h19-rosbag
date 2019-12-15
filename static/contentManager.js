@@ -1,5 +1,5 @@
 class contentManager {
-    constructor(idMainTable, idTopicsTable, idMsgsTable, idMainMenu, idTopicsMenu, idMsgsMenu){
+    constructor(idHeader, idMainTable, idTopicsTable, idMsgsTable, idMainMenu, idTopicsMenu, idMsgsMenu){
         this.idMainTable = idMainTable
         this.idTopicsTable = idTopicsTable
         this.idMsgsTable = idMsgsTable
@@ -13,6 +13,7 @@ class contentManager {
     }
 
     showMainTable(){
+        // this._SetLabelInHeader(textOfMainLabel)
         $$(`${this.activeTable}`).hide()
         $$(`${this.activeMenu}`).hide()
         $$(`${this.idMainTable}`).show()
@@ -86,13 +87,11 @@ class contentManager {
         
         webix.ajax(requestString, requestData, function(result) {
             result = JSON.parse(result)
-            console.log(requestData)
             
             for (var key in result) { // должен быть один   
                 let msgs = result[key]["msgs_list"]["msgs_list"]
 
                 msgs.forEach(element => {
-                    console.log(element)
                     $$(tableID).add({
                         id: requestData["id"] + "|_|" + requestData["topic_name"] + "|_|" + element['msg_name'],
                         msgs_name: element['msg_name'],
@@ -127,5 +126,15 @@ class contentManager {
         })
         return ids
     }
-    
+    // _SetLabelInHeader(text){
+    //     let idLabel = "headerLabel"
+                
+    //     let label = $$(idLabel)["config"]["label"]
+    //     console.log("header before", label)
+    //     label += text + "/"
+    //     $$(idLabel)["config"]["label"]= label
+    //     console.log($$(idLabel)["config"]["label"])
+    //     $$(idLabel).refresh()
+    // }
+
 }
