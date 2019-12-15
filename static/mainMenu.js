@@ -7,7 +7,10 @@ var MainMenu = {
     subMenuPos: "right",
     data: [{
         id: "chooseUpload",
-        value: "Добавить..."
+        value: "Загрузить файлы..."
+    }, {
+        id: "chooseDownload",
+        value: "Выгрузить файлы..."
     }, {
         id: "filter",
         value: "Отфильтровать по...",
@@ -33,6 +36,14 @@ var MainMenu = {
         onMenuItemClick: function(id) {
             if (id == "chooseUpload") {
                 $$("windowUpload").show()
+            }
+            
+            if (id == "chooseDownload"){
+                webix.ajax("/getFilesNumber", function(result) {
+                    result = JSON.parse(result)
+                    $$("labelDownloadWindow").setValue(`Количество файлов для загрузки: ${result['result']}.`)
+                    $$("windowDownload").show()
+                })
             }
 
             if (id == "filterByDate") {

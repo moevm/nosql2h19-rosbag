@@ -3,10 +3,12 @@ var WindowUpload = {
     view: 'window',
     head: 'Загрузка новых файлов',
     modal: true,
-    width: 600,
+    width: 400,
     height: 500,
     resize: true,
     position: 'center',
+    move: true,
+    close: true,
     body: {
         view: 'form',
         rows: [{
@@ -21,15 +23,13 @@ var WindowUpload = {
                         // $$("mainTable").refresh()
                     }
                 }
-            },
-            {
+            }, {
                 view: "list",
                 id: "uploadedFilesList",
                 type: "uploader",
                 autoheight: true,
                 borderless: true
-            },
-            {
+            }, {
                 view: "button",
                 label: "Закрыть",
                 click: function() {
@@ -38,11 +38,9 @@ var WindowUpload = {
             }
         ]
     },
-    move: true,
     on: {
         onHide: function(){
             $$("uploadedFilesList").clearAll()
         }
-
     }
 };

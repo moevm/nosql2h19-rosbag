@@ -9,7 +9,7 @@ var Header = {
     "elements": [{
         id: "headerLabel",
         "view": "label",
-        "label": "ROS Bags DB:",
+        "label": "ROS Bags DB",
     },
 ]
 }

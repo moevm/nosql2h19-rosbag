@@ -1,12 +1,15 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-s
-from flask import Flask, render_template, jsonify, make_response, request, redirect, url_for
+from flask import Flask, render_template, jsonify, make_response, request, redirect, url_for, send_file, send_from_directory
 from werkzeug.utils import secure_filename
 import datetime
 import os
 from adapter import getDataFromBag
 import dbQueryManager
 import json
+import io
+import zipfile
+import time
 
 DB = dbQueryManager.dbQueryManager()
 app = Flask(__name__)
@@ -17,8 +20,8 @@ defaultCollection = "bagfiles_test"
 def hello(name=None):
     return render_template('index.html', name=name)
 
-@app.route("/getDocumentsNumber")
-def getDocsData():
+@app.route("/getFilesNumber")
+def getFilesNumber():
     result = DB.getNumberOfDocuments(defaultCollection)
 
     ans = {'status': True, 'result': result}
@@ -80,6 +83,21 @@ def uploadBags():
             else:
                 os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
     return make_response(jsonify({"status": "error"}), 200)
+
+@app.route("/downloadBags", methods=['GET', 'POST'])
+def downBags():
+    uploaded = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'])
+    memory_file = io.BytesIO()
+    with zipfile.ZipFile(memory_file, 'w') as zf:
+        files = ["Double.bag", "hello.bag", "square.bag"]
+        for individualFile in files:
+            data = zipfile.ZipInfo(individualFile)
+            data.date_time = time.localtime(time.time())[:6]
+            data.compress_type = zipfile.ZIP_DEFLATED
+            zf.writestr(data, os.path.join(uploaded, individualFile))
+    memory_file.seek(0)
+    return send_file(memory_file, attachment_filename='capsule.zip', cache_timeout=0)
+
 
 @app.route("/getTopicsInfoById", methods=['GET'])
 def getTopicsInfoById():
