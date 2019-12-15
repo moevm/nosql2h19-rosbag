@@ -1,19 +1,17 @@
-from flask import request, make_response, send_file, jsonify
 from flask import current_app as app
+from flask import request, make_response, send_file, jsonify, Blueprint
 from werkzeug.utils import secure_filename
 import os
-import dbQueryManager
 import json
 import io
 import zipfile
 import time
 import json
-from flask import Blueprint
 
 loading_api = Blueprint('loading_api', __name__, url_prefix="/load")
 
+import dbQueryManager
 DB = dbQueryManager.dbQueryManager()
-defaultCollection = "bagfiles_test"
 
 @loading_api.route("/upload", methods=['GET', 'POST'])
 def uploadBags():
@@ -22,12 +20,13 @@ def uploadBags():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            status = DB.addFile(defaultCollection, filename)
+            status = DB.addFile(app.config["defaultCollection"], filename)
             if status:
                 return make_response(jsonify({"status": "server"}), 200)
             else:
                 os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
     return make_response(jsonify({"status": "error"}), 200)
+
 
 @loading_api.route("/download", methods=['GET'])
 def downBags():

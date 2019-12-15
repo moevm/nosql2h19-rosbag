@@ -1,23 +1,22 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-s
-from flask import Flask, render_template, jsonify, make_response, request, redirect, url_for, send_file, send_from_directory
-from werkzeug.utils import secure_filename
+from flask import Flask, render_template, jsonify, make_response, request
 import datetime
-import os
-from adapter import getDataFromBag
-import dbQueryManager
 import json
-import io
-import zipfile
-import time
-from up_down_loading import loading_api
+
+from adapter import getDataFromBag
 
 app = Flask(__name__)
+from up_down_loading import loading_api
 app.register_blueprint(loading_api)
 
+import dbQueryManager
 DB = dbQueryManager.dbQueryManager()
+
 app.config['UPLOAD_FOLDER'] = dbQueryManager.STORAGE_UPLOAD
-defaultCollection = "bagfiles_test"
+app.config["defaultCollection"] = "bagfiles_test"
+defaultCollection = app.config["defaultCollection"]
+
 
 @app.route("/")
 def hello(name=None):
