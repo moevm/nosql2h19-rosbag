@@ -36,7 +36,6 @@ var WindowFilterTopics = {
                     topics = topics.map((id) => {
                         return id['title']
                     })
-                    console.log(topics)
 
                     tableManager.updateMainTableByRequest("/getFilterData", {
                         ids: tableManager.getCurrentIdsFromMainTable(),
@@ -49,14 +48,4 @@ var WindowFilterTopics = {
             }
         ]
     },
-}
-
-function convertIDtoDir(id){
-    if (id == 0)
-        return "exactly"
-    if (id == 1)
-        return "more"
-    if (id == 2)
-        return "less"
-    console.assert("Error id dir")
 }

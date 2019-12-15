@@ -84,10 +84,8 @@ var MainMenu = {
                     "ids": currentIds
                 }, function(result) {
                     result = JSON.parse(result)
-                    console.log(result)
                     let minDur = Math.round(result['min']) - 1
                     let maxDur = Math.round(result['max']) + 1
-                    console.log(minDur, maxDur)
 
                     $$("valueSlider").define("min", minDur)
                     $$("valueSlider").define("max", maxDur)
