@@ -1,4 +1,5 @@
 var Header = {
+    id: "header",
     "view": "toolbar",
     "css": "webix_dark",
     "padding": {
@@ -6,7 +7,9 @@ var Header = {
         "left": 10
     },
     "elements": [{
+        id: "headerLabel",
         "view": "label",
-        "label": "ROS Bags DB"
-    }]
+        "label": "ROS Bags DB:",
+    },
+]
 }
