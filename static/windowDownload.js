@@ -20,7 +20,7 @@ var WindowDownload = {
                 view: "button",
                 label: "Загрузить файлы",
                 click: function() {
-                    webix.ajax().response("blob").get("/downloadBags", function(text, data){
+                    webix.ajax().response("blob").get("/load/download", function(text, data){
                         webix.html.download(data, "patch.zip");
                     });
                     this.getParentView().getParentView().hide()

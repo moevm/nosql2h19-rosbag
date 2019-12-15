@@ -10,9 +10,12 @@ import json
 import io
 import zipfile
 import time
+from up_down_loading import loading_api
+
+app = Flask(__name__)
+app.register_blueprint(loading_api)
 
 DB = dbQueryManager.dbQueryManager()
-app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = dbQueryManager.STORAGE_UPLOAD
 defaultCollection = "bagfiles_test"
 
@@ -70,34 +73,6 @@ def getStats():
     ans = DB.getStats(defaultCollection)
     return make_response(jsonify(ans), 200)
 
-@app.route("/uploadBags", methods=['GET', 'POST'])
-def uploadBags():
-    if request.method == 'POST':
-        file = request.files['upload']
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            status = DB.addFile(defaultCollection, filename)
-            if status:
-                return make_response(jsonify({"status": "server"}), 200)
-            else:
-                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-    return make_response(jsonify({"status": "error"}), 200)
-
-@app.route("/downloadBags", methods=['GET', 'POST'])
-def downBags():
-    uploaded = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'])
-    memory_file = io.BytesIO()
-    with zipfile.ZipFile(memory_file, 'w') as zf:
-        files = ["Double.bag", "hello.bag", "square.bag"]
-        for individualFile in files:
-            data = zipfile.ZipInfo(individualFile)
-            data.date_time = time.localtime(time.time())[:6]
-            data.compress_type = zipfile.ZIP_DEFLATED
-            zf.writestr(data, os.path.join(uploaded, individualFile))
-    memory_file.seek(0)
-    return send_file(memory_file, attachment_filename='capsule.zip', cache_timeout=0)
-
 
 @app.route("/getTopicsInfoById", methods=['GET'])
 def getTopicsInfoById():
@@ -132,13 +107,7 @@ def getMsgsInfoByIdAndTopicName():
     ans = DB.getMsgsInfoByIdAndTopicName(defaultCollection, bagId, topic_name)
     return make_response(jsonify(ans), 200)
 
-def allowed_file(filename):
-    ALLOWED_EXTENSIONS = set(['bag'])
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
-
-
-
 
 if __name__ == '__main__':
     app.run(debug=True)
+    
