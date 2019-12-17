@@ -390,6 +390,9 @@ class dbQueryManager(object):
         ])
         return list(ans)[0]
 
+    def getSummOfMsgs(self, collection_name, bagId, topic_name, msg_name):
+        collection = self.db[collection_name]
+
     @staticmethod
     def __cursorToMap(iterableOfMaps):
         returned = {}

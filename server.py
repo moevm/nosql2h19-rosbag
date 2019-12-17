@@ -117,6 +117,14 @@ def getMsgsByIdAndTopicNameAndMsgsName():
     return make_response(jsonify(ans), 200)
 
 
+@app.route("/getSummOfMsgs", methods=['GET'])
+def getSummOfMsgs():
+    bagId = request.args.get('id')
+    topic_name = request.args.get('topic_name')
+    msg_name = request.args.get('msg_name')
+    ans = DB.getSummOfMsgs(defaultCollection, bagId, topic_name, msg_name)
+    return make_response(jsonify(ans), 200)
+
 if __name__ == '__main__':
     app.run(debug=True)
     

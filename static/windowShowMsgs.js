@@ -20,17 +20,20 @@ var WindowShowMsgs = {
                     {
                         id: "btnSumm",
                         view: "button",
-                        value: "Сумма"
+                        value: "Сумма",
+                        click: showSummaryOfMsgsArray
                     },
                     {
                         id: "btnAvg",
                         view: "button",
-                        value: "Среднее"
+                        value: "Среднее",
+                        click: showAverageOfMsgsArray
                     },
                     {
                         id: "btnGraph",
                         view: "button",
-                        value: "График"
+                        value: "График",
+                        click: showGraphOfMsgsArray
                     },
                 ]
             },
@@ -43,4 +46,33 @@ var WindowShowMsgs = {
             },
         ]
     },
+    on: {
+        onHide: () => {
+            $$("windowShowMsgs")["config"]["curBagId"] = null
+            $$("windowShowMsgs")["config"]["curTopicName"] = null
+            $$("windowShowMsgs")["config"]["curMsgsName"] = null
+        }
+    }
+}
+
+function showSummaryOfMsgsArray(){
+    webix.ajax("/getSummOfMsgs", {
+        id: $$("windowShowMsgs")["config"]["curBagId"],
+        topic_name: $$("windowShowMsgs")["config"]["curTopicName"],
+        msg_name: $$("windowShowMsgs")["config"]["curMsgsName"],
+    }, function(result) {
+        result = JSON.parse(result)
+        console.log(result)
+        // todo
+        webix.alert("Summary")
+        });
+    })
+}
+
+function showAverageOfMsgsArray(){
+    webix.alert("Average")
+}
+
+function showGraphOfMsgsArray(){
+    webix.alert("Graph")
 }
