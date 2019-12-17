@@ -123,6 +123,20 @@ def getSummOfMsgs():
     topic_name = request.args.get('topic_name')
     msg_name = request.args.get('msg_name')
     ans = DB.getSummOfMsgs(defaultCollection, bagId, topic_name, msg_name)
+
+    ans["isValid"] = True
+    if not ans['type'] in ["float32", "float64", "int8", "int16", "int32", "int64"]:
+        ans["isValid"] = False
+    del ans['type']
+    return make_response(jsonify(ans), 200)
+
+
+@app.route("/getAvgOfMsgs", methods=['GET'])
+def getAvgOfMsgs():
+    bagId = request.args.get('id')
+    topic_name = request.args.get('topic_name')
+    msg_name = request.args.get('msg_name')
+    ans = DB.getAvgOfMsgs(defaultCollection, bagId, topic_name, msg_name)
     
     ans["isValid"] = True
     if not ans['type'] in ["float32", "float64", "int8", "int16", "int32", "int64"]:

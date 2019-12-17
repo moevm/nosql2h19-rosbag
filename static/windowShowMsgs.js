@@ -70,7 +70,17 @@ function showSummaryOfMsgsArray(){
 }
 
 function showAverageOfMsgsArray(){
-    webix.alert("Average")
+    webix.ajax("/getAvgOfMsgs", {
+        id: $$("windowShowMsgs")["config"]["curBagId"],
+        topic_name: $$("windowShowMsgs")["config"]["curTopicName"],
+        msg_name: $$("windowShowMsgs")["config"]["curMsgsName"],
+    }, function(result) {
+        result = JSON.parse(result)
+        if (result['isValid'])
+            webix.alert(`Итоговое среднее: ${result['average']}`)
+        else
+            webix.alert(`Некорректный тип`)
+    });
 }
 
 function showGraphOfMsgsArray(){
