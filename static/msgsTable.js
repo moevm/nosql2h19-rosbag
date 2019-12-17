@@ -39,24 +39,21 @@ var MsgsTable = {
             let topic_name = data[1]
             let cur_msg_name = data[2]
 
-            webix.ajax("/getMsgsInfoByIdAndTopicName", {
+            webix.ajax("/getMsgsByIdAndTopicNameAndMsgsName", {
                 id: id,
                 topic_name: topic_name,
+                msg_name: cur_msg_name,
             }, function(result) {
                 result = JSON.parse(result)
-                for (var key in result) { // должен быть один   
-                    let msgs = result[key]["msgs_list"]["msgs_list"]
-                    msgs = msgs.find((element) => {
-                        if (element['msg_name'] == cur_msg_name)
-                            return true
-                    })
-                    msgs = msgs['msgs'] 
-    
-                    $$("listOfMsgs").clearAll()
-                    msgs.forEach(element => {
-                        $$("listOfMsgs").add({msg: element})         
-                    });
-                }
+                
+                $$("listOfMsgs").clearAll()
+                result["msgs"].forEach(element => {
+                    $$("listOfMsgs").add({msg: element})         
+                });
+
+                $$("windowShowMsgs")["config"]["curBagId"] = id;
+                $$("windowShowMsgs")["config"]["curTopicName"] = topic_name;
+                $$("windowShowMsgs")["config"]["curMsgsName"] = cur_msg_name;
             })
             $$("windowShowMsgs").show()
         }

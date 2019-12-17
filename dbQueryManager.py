@@ -329,7 +329,6 @@ class dbQueryManager(object):
                 }
             }, {
                 "$project": {
-                    # "msgs_list": "$topics_list.msgs_list",
                     "msgs_list": {
                         "$filter": {
                             "input": "$topics_list",
@@ -343,6 +342,53 @@ class dbQueryManager(object):
             }
         ])
         return self.tmpGetDict(ans)
+
+    def getMsgsByIdAndTopicNameAndMsgsName(self, collection_name, bagId, topic_name, msg_name):
+        collection = self.db[collection_name]
+        ans = collection.aggregate([{
+                "$match": {
+                    "_id": ObjectId(bagId),
+                    "topics_list.topic_name": topic_name
+                }
+            }, {
+                "$project": {
+                    "msgs_list": {
+                        "$filter": {
+                            "input": "$topics_list",
+                            "as": "item",
+                            "cond": { "$eq": ["$$item.topic_name", topic_name] }
+                        }
+                    }
+                }
+            }, {
+                "$unwind": "$msgs_list"
+            },
+            {
+                "$project": {
+                    "msgs": '$msgs_list.msgs_list'
+                }
+            },
+            {
+                "$project": {
+                    "ans": {
+                        "$filter": {
+                            "input": "$msgs",
+                            "as": "item",
+                            "cond": { "$eq": ["$$item.msg_name", msg_name] }
+                        }
+                    }
+                }
+            }, {
+                "$unwind": "$ans"
+            },{
+                "$project": {
+                    "_id": 0,
+                    "msgs": "$ans.msgs"
+                }
+            }
+            
+        ])
+        return list(ans)[0]
 
     @staticmethod
     def __cursorToMap(iterableOfMaps):

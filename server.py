@@ -3,6 +3,7 @@
 from flask import Flask, render_template, jsonify, make_response, request
 import datetime
 import json
+import pprint
 
 from adapter import getDataFromBag
 
@@ -104,6 +105,15 @@ def getMsgsInfoByIdAndTopicName():
     bagId = request.args.get('id')
     topic_name = request.args.get('topic_name')
     ans = DB.getMsgsInfoByIdAndTopicName(defaultCollection, bagId, topic_name)
+    return make_response(jsonify(ans), 200)
+
+
+@app.route("/getMsgsByIdAndTopicNameAndMsgsName", methods=['GET'])
+def getMsgsByIdAndTopicNameAndMsgsName():
+    bagId = request.args.get('id')
+    topic_name = request.args.get('topic_name')
+    msg_name = request.args.get('msg_name')
+    ans = DB.getMsgsByIdAndTopicNameAndMsgsName(defaultCollection, bagId, topic_name, msg_name)
     return make_response(jsonify(ans), 200)
 
 
