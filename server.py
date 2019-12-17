@@ -123,6 +123,11 @@ def getSummOfMsgs():
     topic_name = request.args.get('topic_name')
     msg_name = request.args.get('msg_name')
     ans = DB.getSummOfMsgs(defaultCollection, bagId, topic_name, msg_name)
+    
+    ans["isValid"] = True
+    if not ans['type'] in ["float32", "float64", "int8", "int16", "int32", "int64"]:
+        ans["isValid"] = False
+    del ans['type']
     return make_response(jsonify(ans), 200)
 
 if __name__ == '__main__':

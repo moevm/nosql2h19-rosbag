@@ -62,11 +62,11 @@ function showSummaryOfMsgsArray(){
         msg_name: $$("windowShowMsgs")["config"]["curMsgsName"],
     }, function(result) {
         result = JSON.parse(result)
-        console.log(result)
-        // todo
-        webix.alert("Summary")
-        });
-    })
+        if (result['isValid'])
+            webix.alert(`Итоговая сумма: ${result['summary']}`)
+        else
+            webix.alert(`Некорректный тип`)
+    });
 }
 
 function showAverageOfMsgsArray(){
