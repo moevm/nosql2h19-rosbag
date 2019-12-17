@@ -84,5 +84,5 @@ function showAverageOfMsgsArray(){
 }
 
 function showGraphOfMsgsArray(){
-    webix.alert("Graph")
+    webix.alert({text:`<img src="/getGraph" alt="Graph" width="600" height="400"`, width:"630px", height:"480px"})
 }

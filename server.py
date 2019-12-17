@@ -1,9 +1,16 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-s
-from flask import Flask, render_template, jsonify, make_response, request
+from flask import Flask, render_template, jsonify, make_response, request, send_file
 import datetime
 import json
 import pprint
+
+import io
+import random
+from flask import Response
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+
 
 from adapter import getDataFromBag
 
@@ -143,6 +150,23 @@ def getAvgOfMsgs():
         ans["isValid"] = False
     del ans['type']
     return make_response(jsonify(ans), 200)
+
+
+@app.route("/getGraph", methods=['GET'])
+def getGraph():
+    bagId = request.args.get('id')
+    topic_name = request.args.get('topic_name')
+    msg_name = request.args.get('msg_name')
+
+    fig = Figure(figsize=(9, 6), dpi=80)
+    axis = fig.add_subplot(1, 1, 1)
+    xs = range(100)
+    ys = [random.randint(1, 50) for x in xs]
+    axis.plot(xs, ys)
+
+    output = io.BytesIO()
+    FigureCanvas(fig).print_png(output)
+    return Response(output.getvalue(), mimetype='image/png')
 
 if __name__ == '__main__':
     app.run(debug=True)
