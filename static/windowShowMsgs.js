@@ -65,7 +65,7 @@ function showSummaryOfMsgsArray(){
         if (result['isValid'])
             webix.alert(`Итоговая сумма: ${result['summary']}`)
         else
-            webix.alert(`Некорректный тип`)
+            webix.alert(`Некорректный тип для суммы`)
     });
 }
 
@@ -79,10 +79,26 @@ function showAverageOfMsgsArray(){
         if (result['isValid'])
             webix.alert(`Итоговое среднее: ${result['average']}`)
         else
-            webix.alert(`Некорректный тип`)
+            webix.alert(`Некорректный тип для среднего`)
     });
 }
 
 function showGraphOfMsgsArray(){
-    webix.alert({text:`<img src="/getGraph" alt="Graph" width="600" height="400"`, width:"630px", height:"480px"})
+    // Осторожно! Костыль!
+    webix.ajax("/getGraph", {
+        id: $$("windowShowMsgs")["config"]["curBagId"],
+        topic_name: $$("windowShowMsgs")["config"]["curTopicName"],
+        msg_name: $$("windowShowMsgs")["config"]["curMsgsName"],
+    }, function(text, data, xhr) {
+        // Возможно можно запихать data в img srs через base64..
+        if (xhr.getResponseHeader('isNumeric') == "True"){
+            let src = "/getGraph" + `?id=${$$("windowShowMsgs")["config"]["curBagId"]}`
+                                  + `&topic_name=${$$("windowShowMsgs")["config"]["curTopicName"]}`
+                                  + `&msg_name=${$$("windowShowMsgs")["config"]["curMsgsName"]}`
+            webix.alert({text:`<img src=${src} alt="Graph" width="600" height="400"`, width:"630px", height:"480px"})
+        }
+        else
+            webix.alert(`Некорректный тип для графика`)
+    } );
+    
 }

@@ -121,6 +121,7 @@ def getMsgsByIdAndTopicNameAndMsgsName():
     topic_name = request.args.get('topic_name')
     msg_name = request.args.get('msg_name')
     ans = DB.getMsgsByIdAndTopicNameAndMsgsName(defaultCollection, bagId, topic_name, msg_name)
+    del ans['isNumeric']
     return make_response(jsonify(ans), 200)
 
 
@@ -157,17 +158,24 @@ def getGraph():
     bagId = request.args.get('id')
     topic_name = request.args.get('topic_name')
     msg_name = request.args.get('msg_name')
-
-    fig = Figure(figsize=(9, 6), dpi=80)
-    axis = fig.add_subplot(1, 1, 1)
-    xs = range(100)
-    ys = [random.randint(1, 50) for x in xs]
-    axis.plot(xs, ys)
+    ans = DB.getMsgsByIdAndTopicNameAndMsgsName(defaultCollection, bagId, topic_name, msg_name)
 
     output = io.BytesIO()
-    FigureCanvas(fig).print_png(output)
-    return Response(output.getvalue(), mimetype='image/png')
+    if ans['isNumeric']:
+        fig = Figure(figsize=(9, 6), dpi=80)
+        axis = fig.add_subplot(1, 1, 1)
+        xs = range(len(ans['msgs']))
+        ys = ans['msgs']
+        axis.plot(xs, ys)
+        FigureCanvas(fig).print_png(output)
+    
+    r = Response(output.getvalue(), mimetype='image/png')
+    r.headers['isNumeric'] = ans['isNumeric']
+    return r
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
+    app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
     

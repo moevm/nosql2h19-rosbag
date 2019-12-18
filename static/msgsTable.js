@@ -45,7 +45,6 @@ var MsgsTable = {
                 msg_name: cur_msg_name,
             }, function(result) {
                 result = JSON.parse(result)
-                
                 $$("listOfMsgs").clearAll()
                 result["msgs"].forEach(element => {
                     $$("listOfMsgs").add({msg: element})         

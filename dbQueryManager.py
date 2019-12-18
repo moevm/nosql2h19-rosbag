@@ -383,12 +383,16 @@ class dbQueryManager(object):
             },{
                 "$project": {
                     "_id": 0,
+                    "type": "$ans.msg_type",
                     "msgs": "$ans.msgs"
                 }
             }
             
         ])
-        return list(ans)[0]
+        ans = list(ans)[0]
+        ans["isNumeric"] = self.__isNumuricMsgType(ans['type'])
+        del ans['type']
+        return ans
 
     def getSummOfMsgs(self, collection_name, bagId, topic_name, msg_name):
         collection = self.db[collection_name]
@@ -487,12 +491,17 @@ class dbQueryManager(object):
         return list(ans)[0]
 
     @staticmethod
+    def __isNumuricMsgType(msg_type):
+        return msg_type in ["float32", "float64", "int8", "int16", "int32", "int64"]
+
+    @staticmethod
     def __cursorToMap(iterableOfMaps):
         returned = {}
         for obj in iterableOfMaps:
             objID = obj.pop("_id")
             returned[objID] = obj
         return returned
+
 
 
 if __name__ == "__main__":
