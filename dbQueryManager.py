@@ -248,66 +248,24 @@ class dbQueryManager(object):
 
     def getMsgsInfoByIdAndTopicName(self, collection_name, bagId, topic_name):
         collection = self.db[collection_name]
-        ans = collection.aggregate([{
-                "$match": {
-                    "_id": ObjectId(bagId),
-                    "topics_list.topic_name": topic_name
-                }
-            }, {
-                "$project": {
-                    "msgs_list": {
-                        "$filter": {
-                            "input": "$topics_list",
-                            "as": "item",
-                            "cond": { "$eq": ["$$item.topic_name", topic_name] }
-                        }
-                    }
-                }
-            }, {
-                "$unwind": "$msgs_list"
-            }
-        ])
+        bagId = ObjectId(bagId)
+        queryText = self.__getQueryToGetMsgsByIdAndTopicName(bagId, topic_name)
+        ans = collection.aggregate(queryText)
         return self.tmpGetDict(ans)
 
     def getMsgsByIdAndTopicNameAndMsgsName(self, collection_name, bagId, topic_name, msg_name):
         collection = self.db[collection_name]
-        ans = collection.aggregate([{
-                "$match": {
-                    "_id": ObjectId(bagId),
-                    "topics_list.topic_name": topic_name
-                }
-            }, {
-                "$project": {
-                    "msgs_list": {
-                        "$filter": {
-                            "input": "$topics_list",
-                            "as": "item",
-                            "cond": { "$eq": ["$$item.topic_name", topic_name] }
-                        }
-                    }
-                }
-            }, {
-                "$unwind": "$msgs_list"
-            }, {
-                "$project": {
-                    "ans": {
-                        "$filter": {
-                            "input": "$msgs_list.msgs_list",
-                            "as": "item",
-                            "cond": { "$eq": ["$$item.msg_name", msg_name] }
-                        }
-                    }
-                }
-            }, {
-                "$unwind": "$ans"
-            },{
+        bagId = ObjectId(bagId)
+        queryText = self.__getQueryToGetMsgsByIdAndTopicNameAndMsgsName(bagId, topic_name, msg_name)
+        queryText += [{
                 "$project": {
                     "_id": 0,
                     "type": "$ans.msg_type",
                     "msgs": "$ans.msgs"
                 }
             }
-        ])
+        ]
+        ans = collection.aggregate(queryText)
         ans = list(ans)[0]
         ans["isNumeric"] = self.__isNumuricMsgType(ans['type'])
         del ans['type']
@@ -315,50 +273,38 @@ class dbQueryManager(object):
 
     def getSummOfMsgs(self, collection_name, bagId, topic_name, msg_name):
         collection = self.db[collection_name]
-        ans = collection.aggregate([{
-                "$match": {
-                    "_id": ObjectId(bagId),
-                    "topics_list.topic_name": topic_name
-                }
-            }, {
-                "$project": {
-                    "msgs_list": {
-                        "$filter": {
-                            "input": "$topics_list",
-                            "as": "item",
-                            "cond": { "$eq": ["$$item.topic_name", topic_name] }
-                        }
-                    }
-                }
-            }, {
-                "$unwind": "$msgs_list"
-            }, {
-                "$project": {
-                    "ans": {
-                        "$filter": {
-                            "input": "$msgs_list.msgs_list",
-                            "as": "item",
-                            "cond": { "$eq": ["$$item.msg_name", msg_name] }
-                        }
-                    }
-                }
-            }, {
-                "$unwind": "$ans"
-            }, {
+        bagId = ObjectId(bagId)
+        queryText = self.__getQueryToGetMsgsByIdAndTopicNameAndMsgsName(bagId, topic_name, msg_name)
+        queryText += [{
                 "$project": {
                     "_id": 0,
                     "type": "$ans.msg_type",
                     "summary": { "$sum": "$ans.msgs"}
                 }
             },
-        ])
+        ]
+        ans = collection.aggregate(queryText)
         return list(ans)[0]
 
     def getAvgOfMsgs(self, collection_name, bagId, topic_name, msg_name):
         collection = self.db[collection_name]
-        ans = collection.aggregate([{
+        bagId = ObjectId(bagId)
+        queryText = self.__getQueryToGetMsgsByIdAndTopicNameAndMsgsName(bagId, topic_name, msg_name)
+        queryText += [{
+                "$project": {
+                    "_id": 0,
+                    "type": "$ans.msg_type",
+                    "average": { "$avg": "$ans.msgs"}
+                }
+            },
+        ]
+        ans = collection.aggregate(queryText)
+        return list(ans)[0]
+
+    def __getQueryToGetMsgsByIdAndTopicName(self, bagObjId, topic_name):
+        return [{
                 "$match": {
-                    "_id": ObjectId(bagId),
+                    "_id": bagObjId,
                     "topics_list.topic_name": topic_name
                 }
             }, {
@@ -373,7 +319,12 @@ class dbQueryManager(object):
                 }
             }, {
                 "$unwind": "$msgs_list"
-            }, {
+            },
+        ]
+    
+    def __getQueryToGetMsgsByIdAndTopicNameAndMsgsName(self, bagObjId, topic_name, msg_name):
+        queryText = self.__getQueryToGetMsgsByIdAndTopicName(bagObjId, topic_name)
+        queryText += [{
                 "$project": {
                     "ans": {
                         "$filter": {
@@ -385,15 +336,9 @@ class dbQueryManager(object):
                 }
             }, {
                 "$unwind": "$ans"
-            }, {
-                "$project": {
-                    "_id": 0,
-                    "type": "$ans.msg_type",
-                    "average": { "$avg": "$ans.msgs"}
-                }
             },
-        ])
-        return list(ans)[0]
+        ]
+        return queryText
 
     @staticmethod
     def __isNumuricMsgType(msg_type):
@@ -406,12 +351,12 @@ class dbQueryManager(object):
             objID = obj.pop("_id")
             returned[objID] = obj
         return returned
-
-
+        
 
 if __name__ == "__main__":
     manager = dbQueryManager()
     collection = "bagfiles_test"
+    print("Test for query manager!")
     
     # lel = manager.getMainInfo(collection)
     # lel = manager.getBagsByTopics(collection, ["quaternionTopic", "poseTopic"])
@@ -420,12 +365,6 @@ if __name__ == "__main__":
     # date = datetime.datetime(2019, 11, 10, 0,0,0,0)
     # lel = manager.getBagsByDateDistance(collection, date, "more")
 
-    
-    # kek = manager.getSortedBy(collection, "date_creation")
-    # kek = [elem["_id"] for elem in kek]
-    # print(kek)
 
-    # for bag in lel.values():
-    #     print(bag["filename"])
     
 

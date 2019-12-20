@@ -76,7 +76,6 @@ def getFilterData():
 @app.route("/getTopicsInfoById", methods=['GET'])
 def getTopicsInfoById():
     bagId = request.args.get('id')
-    print(bagId)
     ans = DB.getTopicsInfoById(defaultCollection, bagId)
     return make_response(jsonify(ans), 200)
 
@@ -113,7 +112,6 @@ def getMsgsByIdAndTopicNameAndMsgsName():
     topic_name = request.args.get('topic_name')
     msg_name = request.args.get('msg_name')
     ans = DB.getMsgsByIdAndTopicNameAndMsgsName(defaultCollection, bagId, topic_name, msg_name)
-    pprint.pprint(ans)
     del ans['isNumeric']
     return make_response(jsonify(ans), 200)
 
