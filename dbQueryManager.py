@@ -251,9 +251,7 @@ class dbQueryManager(object):
         collection = self.db[collection_name]    
         ans = collection.aggregate([{
                 "$match": {
-                    "_id": {
-                        "$in": bagIds
-                    }
+                    "_id": { "$in": bagIds }
                 }
             }, {
                 "$project": {
@@ -264,9 +262,7 @@ class dbQueryManager(object):
                 "$unwind": "$topic_names"
             },
             {
-                "$group": {
-                    "_id": "$topic_names",
-                }
+                "$group": { "_id": "$topic_names" }
             }
         ])
         ans = [x['_id'] for x in list(ans)]
@@ -284,12 +280,8 @@ class dbQueryManager(object):
             }, {
                 "$group": {
                     "_id": "null",
-                    "max": {
-                        "$max": "$date_creation"
-                    },
-                    "min": {
-                        "$min": "$date_creation"
-                    }
+                    "max": { "$max": "$date_creation" },
+                    "min": { "$min": "$date_creation" }
                 }
             }, {
                 "$project": {
@@ -312,12 +304,8 @@ class dbQueryManager(object):
             }, {
                 "$group": {
                     "_id": "null",
-                    "max": {
-                        "$max": "$duration"
-                    },
-                    "min": {
-                        "$min": "$duration"
-                    }
+                    "max": { "$max": "$duration" },
+                    "min": { "$min": "$duration" }
                 }
             }, {
                 "$project": {
@@ -370,17 +358,11 @@ class dbQueryManager(object):
                 }
             }, {
                 "$unwind": "$msgs_list"
-            },
-            {
-                "$project": {
-                    "msgs": '$msgs_list.msgs_list'
-                }
-            },
-            {
+            }, {
                 "$project": {
                     "ans": {
                         "$filter": {
-                            "input": "$msgs",
+                            "input": "$msgs_list.msgs_list",
                             "as": "item",
                             "cond": { "$eq": ["$$item.msg_name", msg_name] }
                         }
@@ -395,7 +377,6 @@ class dbQueryManager(object):
                     "msgs": "$ans.msgs"
                 }
             }
-            
         ])
         ans = list(ans)[0]
         ans["isNumeric"] = self.__isNumuricMsgType(ans['type'])
@@ -421,17 +402,11 @@ class dbQueryManager(object):
                 }
             }, {
                 "$unwind": "$msgs_list"
-            },
-            {
-                "$project": {
-                    "msgs": '$msgs_list.msgs_list'
-                }
-            },
-            {
+            }, {
                 "$project": {
                     "ans": {
                         "$filter": {
-                            "input": "$msgs",
+                            "input": "$msgs_list.msgs_list",
                             "as": "item",
                             "cond": { "$eq": ["$$item.msg_name", msg_name] }
                         }
@@ -439,8 +414,7 @@ class dbQueryManager(object):
                 }
             }, {
                 "$unwind": "$ans"
-            },
-            {
+            }, {
                 "$project": {
                     "_id": 0,
                     "type": "$ans.msg_type",
@@ -469,17 +443,11 @@ class dbQueryManager(object):
                 }
             }, {
                 "$unwind": "$msgs_list"
-            },
-            {
-                "$project": {
-                    "msgs": '$msgs_list.msgs_list'
-                }
-            },
-            {
+            }, {
                 "$project": {
                     "ans": {
                         "$filter": {
-                            "input": "$msgs",
+                            "input": "$msgs_list.msgs_list",
                             "as": "item",
                             "cond": { "$eq": ["$$item.msg_name", msg_name] }
                         }
@@ -487,8 +455,7 @@ class dbQueryManager(object):
                 }
             }, {
                 "$unwind": "$ans"
-            },
-            {
+            }, {
                 "$project": {
                     "_id": 0,
                     "type": "$ans.msg_type",
@@ -516,14 +483,14 @@ if __name__ == "__main__":
     manager = dbQueryManager()
     collection = "bagfiles_test"
     
-    manager.getNumberOfDocuments(collection)
-    manager.getDocumentNames(collection)
+    # manager.getNumberOfDocuments(collection)
+    # manager.getDocumentNames(collection)
     
-    lel = manager.getMainInfo(collection)
+    # lel = manager.getMainInfo(collection)
     # lel = manager.getBagsByTopics(collection, ["quaternionTopic", "poseTopic"])
     # lel = manager.getBagsByTopics(collection, ["/chatter"])
     # lel = manager.getBagsByMsgsNumber(collection, 9, 1000)
-    date = datetime.datetime(2019, 11, 10, 0,0,0,0)
+    # date = datetime.datetime(2019, 11, 10, 0,0,0,0)
     # lel = manager.getBagsByDateDistance(collection, date, "more")
 
     
