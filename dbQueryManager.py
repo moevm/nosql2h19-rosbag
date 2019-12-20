@@ -20,18 +20,6 @@ class dbQueryManager(object):
         self.client = MongoClient()
         self.db = self.client[db_name]
 
-
-
-    def addAll(self, collection_name):
-        for bagname in ['bags/Double.bag', 'bags/hello.bag', 'bags/square.bag']:
-            newDocument = getDataFromBag(bagname)
-            collection = self.db[collection_name]
-            post_id = collection.insert_one(newDocument).inserted_id
-        resultCursor = collection.find({}, {"topics_list.msgs_list.msgs" : {"$slice": 10}})
-        return self.tmpGetDict(resultCursor)
-
-
-
     def addFile(self, collection_name, fileName):
         try:
             bagname = STORAGE_UPLOAD + fileName
@@ -42,19 +30,14 @@ class dbQueryManager(object):
             return False
         return True
 
-
-
     def getNumberOfDocuments(self, collection_name):
         collection = self.db[collection_name]
         result = collection.count({})
         return result
 
-    def getDocumentNames(self, collection_name):
-        result = ["Name1", "Name2", "Name3"]
-        return result
-
     def getMainInfo(self, collection_name):
         collection = self.db[collection_name]
+        # todo
         resultCursor = collection.find({}, {"topics_list.msgs_list.msgs" : {"$slice": 10}})
         return self.tmpGetDict(resultCursor)
         # return dbQueryManager.__cursorToMap(resultCursor)
@@ -64,7 +47,8 @@ class dbQueryManager(object):
         resultCursor = collection.find().sort(
             [(sortedKey, 1)]
         )
-        return dbQueryManager.__cursorToMap(resultCursor)
+        return self.tmpGetDict(resultCursor)
+        # return dbQueryManager.__cursorToMap(resultCursor)
 
     def getBagsByTopics(self, collection_name, bagIds, topics):
         bagIds = map(ObjectId, bagIds)
@@ -131,6 +115,7 @@ class dbQueryManager(object):
 
 
     def getBagsByMsgsNumber(self, collection_name, min_num, max_num):
+        # @outdated
         collection = self.db[collection_name]
         resultCursor = collection.aggregate([
             {
@@ -165,68 +150,13 @@ class dbQueryManager(object):
             "_id": {"$in": res}
         })
 
-        # for kek in ans:
-        #     pprint(kek["filename"])
         return dbQueryManager.__cursorToMap(ans)
 
-
-    def getStats(self, collection_name):
-        collection = self.db[collection_name]
-        topic = "quaternionTopic"
-        msgName = "x"
-        summary = collection.aggregate([
-            { "$match": { 
-            "$and": [
-                    { "filename": "Double.bag" },
-                    { "topics_list.topic_name": topic },
-                    { "topics_list.msgs_list.msg_name": msgName }
-            ]
-            } }, # Match documents to shrink their quantity
-            { "$project": {
-            #  "list": "$topics_list.msgs_list.msgs",
-                "filteredByTopic": {
-                    "$filter": {
-                    "input": "$topics_list",
-                    "cond": { "$and": [
-                        { "$eq": [ '$$this.topic_name', topic ] },
-                        ] }
-                    }
-                }
-            } }, # Filter topics_list by topic name
-            { "$project": {
-                "filteredByTopic": {"$arrayElemAt": ["$filteredByTopic", 0] },
-            } }, # Take first elem in result
-            { "$project": {
-                "filteredByTopic": "$filteredByTopic.msgs_list",
-            } }, # Take msges in that topic
-            { "$project": {
-                "filteredByMsgName": {
-                    "$filter": {
-                        "input": "$filteredByTopic",
-                        "cond": {
-                            "$eq": [ "$$this.msg_name", msgName]
-                        }
-                    }
-                }
-            } }, # Filter msges by msg name
-            { "$project": {
-                "filteredByMsgName": {"$arrayElemAt": ["$filteredByMsgName", 0] },
-            } }, # Take first elem in result
-        { "$project": {
-            "sum": { "$sum": "$filteredByMsgName.msgs" },
-        } }, # Sum all elements in msgs
-        ]) # .next()
-        return self.tmpGetDict(sum)
-
-    def getNumberOfMsgs(self, collection_name):
-        pass
 
     def tmpGetDict(self, iterableOfMaps):
         returned = {}
         for obj in iterableOfMaps:
             objID = str(obj.pop("_id"))
-            # print dir(objID)
-            # print int(getattr(objID, '_ObjectId__id'), 0)
             returned[objID] = obj
         return returned
     
@@ -251,9 +181,7 @@ class dbQueryManager(object):
         collection = self.db[collection_name]    
         ans = collection.aggregate([{
                 "$match": {
-                    "_id": {
-                        "$in": bagIds
-                    }
+                    "_id": { "$in": bagIds }
                 }
             }, {
                 "$project": {
@@ -264,9 +192,7 @@ class dbQueryManager(object):
                 "$unwind": "$topic_names"
             },
             {
-                "$group": {
-                    "_id": "$topic_names",
-                }
+                "$group": { "_id": "$topic_names" }
             }
         ])
         ans = [x['_id'] for x in list(ans)]
@@ -284,16 +210,16 @@ class dbQueryManager(object):
             }, {
                 "$group": {
                     "_id": "null",
-                    "max": {
-                        "$max": "$date_creation"
-                    },
-                    "min": {
-                        "$min": "$date_creation"
-                    }
+                    "max": { "$max": "$date_creation" },
+                    "min": { "$min": "$date_creation" }
                 }
-        }])
+            }, {
+                "$project": {
+                    "_id": 0
+                }
+            }
+        ])
         ans = list(ans)[0]
-        del ans["_id"]
         return ans
 
     def getMaxMinDurationsByIds(self, collection_name, bagIds):
@@ -308,87 +234,38 @@ class dbQueryManager(object):
             }, {
                 "$group": {
                     "_id": "null",
-                    "max": {
-                        "$max": "$duration"
-                    },
-                    "min": {
-                        "$min": "$duration"
-                    }
+                    "max": { "$max": "$duration" },
+                    "min": { "$min": "$duration" }
                 }
-        }])
+            }, {
+                "$project": {
+                    "_id": 0
+                }
+            }
+        ])
         ans = list(ans)[0]
-        del ans["_id"]
         return ans
 
     def getMsgsInfoByIdAndTopicName(self, collection_name, bagId, topic_name):
         collection = self.db[collection_name]
-        ans = collection.aggregate([{
-                "$match": {
-                    "_id": ObjectId(bagId),
-                    "topics_list.topic_name": topic_name
-                }
-            }, {
-                "$project": {
-                    "msgs_list": {
-                        "$filter": {
-                            "input": "$topics_list",
-                            "as": "item",
-                            "cond": { "$eq": ["$$item.topic_name", topic_name] }
-                        }
-                    }
-                }
-            }, {
-                "$unwind": "$msgs_list"
-            }
-        ])
+        bagId = ObjectId(bagId)
+        queryText = self.__getQueryToGetMsgsByIdAndTopicName(bagId, topic_name)
+        ans = collection.aggregate(queryText)
         return self.tmpGetDict(ans)
 
     def getMsgsByIdAndTopicNameAndMsgsName(self, collection_name, bagId, topic_name, msg_name):
         collection = self.db[collection_name]
-        ans = collection.aggregate([{
-                "$match": {
-                    "_id": ObjectId(bagId),
-                    "topics_list.topic_name": topic_name
-                }
-            }, {
-                "$project": {
-                    "msgs_list": {
-                        "$filter": {
-                            "input": "$topics_list",
-                            "as": "item",
-                            "cond": { "$eq": ["$$item.topic_name", topic_name] }
-                        }
-                    }
-                }
-            }, {
-                "$unwind": "$msgs_list"
-            },
-            {
-                "$project": {
-                    "msgs": '$msgs_list.msgs_list'
-                }
-            },
-            {
-                "$project": {
-                    "ans": {
-                        "$filter": {
-                            "input": "$msgs",
-                            "as": "item",
-                            "cond": { "$eq": ["$$item.msg_name", msg_name] }
-                        }
-                    }
-                }
-            }, {
-                "$unwind": "$ans"
-            },{
+        bagId = ObjectId(bagId)
+        queryText = self.__getQueryToGetMsgsByIdAndTopicNameAndMsgsName(bagId, topic_name, msg_name)
+        queryText += [{
                 "$project": {
                     "_id": 0,
                     "type": "$ans.msg_type",
                     "msgs": "$ans.msgs"
                 }
             }
-            
-        ])
+        ]
+        ans = collection.aggregate(queryText)
         ans = list(ans)[0]
         ans["isNumeric"] = self.__isNumuricMsgType(ans['type'])
         del ans['type']
@@ -396,57 +273,38 @@ class dbQueryManager(object):
 
     def getSummOfMsgs(self, collection_name, bagId, topic_name, msg_name):
         collection = self.db[collection_name]
-        ans = collection.aggregate([{
-                "$match": {
-                    "_id": ObjectId(bagId),
-                    "topics_list.topic_name": topic_name
-                }
-            }, {
-                "$project": {
-                    "msgs_list": {
-                        "$filter": {
-                            "input": "$topics_list",
-                            "as": "item",
-                            "cond": { "$eq": ["$$item.topic_name", topic_name] }
-                        }
-                    }
-                }
-            }, {
-                "$unwind": "$msgs_list"
-            },
-            {
-                "$project": {
-                    "msgs": '$msgs_list.msgs_list'
-                }
-            },
-            {
-                "$project": {
-                    "ans": {
-                        "$filter": {
-                            "input": "$msgs",
-                            "as": "item",
-                            "cond": { "$eq": ["$$item.msg_name", msg_name] }
-                        }
-                    }
-                }
-            }, {
-                "$unwind": "$ans"
-            },
-            {
+        bagId = ObjectId(bagId)
+        queryText = self.__getQueryToGetMsgsByIdAndTopicNameAndMsgsName(bagId, topic_name, msg_name)
+        queryText += [{
                 "$project": {
                     "_id": 0,
                     "type": "$ans.msg_type",
                     "summary": { "$sum": "$ans.msgs"}
                 }
             },
-        ])
+        ]
+        ans = collection.aggregate(queryText)
         return list(ans)[0]
 
     def getAvgOfMsgs(self, collection_name, bagId, topic_name, msg_name):
         collection = self.db[collection_name]
-        ans = collection.aggregate([{
+        bagId = ObjectId(bagId)
+        queryText = self.__getQueryToGetMsgsByIdAndTopicNameAndMsgsName(bagId, topic_name, msg_name)
+        queryText += [{
+                "$project": {
+                    "_id": 0,
+                    "type": "$ans.msg_type",
+                    "average": { "$avg": "$ans.msgs"}
+                }
+            },
+        ]
+        ans = collection.aggregate(queryText)
+        return list(ans)[0]
+
+    def __getQueryToGetMsgsByIdAndTopicName(self, bagObjId, topic_name):
+        return [{
                 "$match": {
-                    "_id": ObjectId(bagId),
+                    "_id": bagObjId,
                     "topics_list.topic_name": topic_name
                 }
             }, {
@@ -462,16 +320,15 @@ class dbQueryManager(object):
             }, {
                 "$unwind": "$msgs_list"
             },
-            {
-                "$project": {
-                    "msgs": '$msgs_list.msgs_list'
-                }
-            },
-            {
+        ]
+    
+    def __getQueryToGetMsgsByIdAndTopicNameAndMsgsName(self, bagObjId, topic_name, msg_name):
+        queryText = self.__getQueryToGetMsgsByIdAndTopicName(bagObjId, topic_name)
+        queryText += [{
                 "$project": {
                     "ans": {
                         "$filter": {
-                            "input": "$msgs",
+                            "input": "$msgs_list.msgs_list",
                             "as": "item",
                             "cond": { "$eq": ["$$item.msg_name", msg_name] }
                         }
@@ -480,15 +337,8 @@ class dbQueryManager(object):
             }, {
                 "$unwind": "$ans"
             },
-            {
-                "$project": {
-                    "_id": 0,
-                    "type": "$ans.msg_type",
-                    "average": { "$avg": "$ans.msgs"}
-                }
-            },
-        ])
-        return list(ans)[0]
+        ]
+        return queryText
 
     @staticmethod
     def __isNumuricMsgType(msg_type):
@@ -501,30 +351,20 @@ class dbQueryManager(object):
             objID = obj.pop("_id")
             returned[objID] = obj
         return returned
-
-
+        
 
 if __name__ == "__main__":
     manager = dbQueryManager()
     collection = "bagfiles_test"
+    print("Test for query manager!")
     
-    manager.getNumberOfDocuments(collection)
-    manager.getDocumentNames(collection)
-    
-    lel = manager.getMainInfo(collection)
+    # lel = manager.getMainInfo(collection)
     # lel = manager.getBagsByTopics(collection, ["quaternionTopic", "poseTopic"])
     # lel = manager.getBagsByTopics(collection, ["/chatter"])
     # lel = manager.getBagsByMsgsNumber(collection, 9, 1000)
-    date = datetime.datetime(2019, 11, 10, 0,0,0,0)
+    # date = datetime.datetime(2019, 11, 10, 0,0,0,0)
     # lel = manager.getBagsByDateDistance(collection, date, "more")
 
-    
-    # print(manager.getNumberOfMsgs(collection))
-    # kek = manager.getSortedBy(collection, "date_creation")
-    # kek = [elem["_id"] for elem in kek]
-    # print(kek)
 
-    # for bag in lel.values():
-    #     print(bag["filename"])
     
 

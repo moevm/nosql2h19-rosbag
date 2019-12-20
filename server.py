@@ -73,18 +73,9 @@ def getFilterData():
     return make_response(jsonify(ans), 200)
 
 
-
-
-@app.route('/getStats', methods=['GET'])
-def getStats():
-    ans = DB.getStats(defaultCollection)
-    return make_response(jsonify(ans), 200)
-
-
 @app.route("/getTopicsInfoById", methods=['GET'])
 def getTopicsInfoById():
     bagId = request.args.get('id')
-    print(bagId)
     ans = DB.getTopicsInfoById(defaultCollection, bagId)
     return make_response(jsonify(ans), 200)
 
