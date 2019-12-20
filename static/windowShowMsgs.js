@@ -1,5 +1,8 @@
 var WindowShowMsgs = {
     id: "windowShowMsgs",
+    curBagId: "null",
+    curTopicName: "null",
+    curMsgsName: "null",
     view: 'window',
     head: 'Список сообщений',
     modal: true,
@@ -12,6 +15,29 @@ var WindowShowMsgs = {
     body: {
         view: 'form',
         rows: [{
+                view:"toolbar",
+                cols:[
+                    {
+                        id: "btnSumm",
+                        view: "button",
+                        value: "Сумма",
+                        click: showSummaryOfMsgsArray
+                    },
+                    {
+                        id: "btnAvg",
+                        view: "button",
+                        value: "Среднее",
+                        click: showAverageOfMsgsArray
+                    },
+                    {
+                        id: "btnGraph",
+                        view: "button",
+                        value: "График",
+                        click: showGraphOfMsgsArray
+                    },
+                ]
+            },
+            {
                 id: "listOfMsgs",
                 view: "list",
                 template: "#msg#",
@@ -20,4 +46,59 @@ var WindowShowMsgs = {
             },
         ]
     },
+    on: {
+        onHide: () => {
+            $$("windowShowMsgs")["config"]["curBagId"] = null
+            $$("windowShowMsgs")["config"]["curTopicName"] = null
+            $$("windowShowMsgs")["config"]["curMsgsName"] = null
+        }
+    }
+}
+
+function showSummaryOfMsgsArray(){
+    webix.ajax("/getSummOfMsgs", {
+        id: $$("windowShowMsgs")["config"]["curBagId"],
+        topic_name: $$("windowShowMsgs")["config"]["curTopicName"],
+        msg_name: $$("windowShowMsgs")["config"]["curMsgsName"],
+    }, function(result) {
+        result = JSON.parse(result)
+        if (result['isValid'])
+            webix.alert(`Итоговая сумма: ${result['summary']}`)
+        else
+            webix.alert(`Некорректный тип для суммы`)
+    });
+}
+
+function showAverageOfMsgsArray(){
+    webix.ajax("/getAvgOfMsgs", {
+        id: $$("windowShowMsgs")["config"]["curBagId"],
+        topic_name: $$("windowShowMsgs")["config"]["curTopicName"],
+        msg_name: $$("windowShowMsgs")["config"]["curMsgsName"],
+    }, function(result) {
+        result = JSON.parse(result)
+        if (result['isValid'])
+            webix.alert(`Итоговое среднее: ${result['average']}`)
+        else
+            webix.alert(`Некорректный тип для среднего`)
+    });
+}
+
+function showGraphOfMsgsArray(){
+    // Осторожно! Костыль!
+    webix.ajax("/getGraph", {
+        id: $$("windowShowMsgs")["config"]["curBagId"],
+        topic_name: $$("windowShowMsgs")["config"]["curTopicName"],
+        msg_name: $$("windowShowMsgs")["config"]["curMsgsName"],
+    }, function(text, data, xhr) {
+        // Возможно можно запихать data в img srs через base64..
+        if (xhr.getResponseHeader('isNumeric') == "True"){
+            let src = "/getGraph" + `?id=${$$("windowShowMsgs")["config"]["curBagId"]}`
+                                  + `&topic_name=${$$("windowShowMsgs")["config"]["curTopicName"]}`
+                                  + `&msg_name=${$$("windowShowMsgs")["config"]["curMsgsName"]}`
+            webix.alert({text:`<img src=${src} alt="Graph" width="600" height="400"`, width:"630px", height:"480px"})
+        }
+        else
+            webix.alert(`Некорректный тип для графика`)
+    } );
+    
 }

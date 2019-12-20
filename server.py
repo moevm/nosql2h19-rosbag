@@ -1,8 +1,16 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-s
-from flask import Flask, render_template, jsonify, make_response, request
+from flask import Flask, render_template, jsonify, make_response, request, send_file
 import datetime
 import json
+import pprint
+
+import io
+import random
+from flask import Response
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+
 
 from adapter import getDataFromBag
 
@@ -107,6 +115,67 @@ def getMsgsInfoByIdAndTopicName():
     return make_response(jsonify(ans), 200)
 
 
+@app.route("/getMsgsByIdAndTopicNameAndMsgsName", methods=['GET'])
+def getMsgsByIdAndTopicNameAndMsgsName():
+    bagId = request.args.get('id')
+    topic_name = request.args.get('topic_name')
+    msg_name = request.args.get('msg_name')
+    ans = DB.getMsgsByIdAndTopicNameAndMsgsName(defaultCollection, bagId, topic_name, msg_name)
+    del ans['isNumeric']
+    return make_response(jsonify(ans), 200)
+
+
+@app.route("/getSummOfMsgs", methods=['GET'])
+def getSummOfMsgs():
+    bagId = request.args.get('id')
+    topic_name = request.args.get('topic_name')
+    msg_name = request.args.get('msg_name')
+    ans = DB.getSummOfMsgs(defaultCollection, bagId, topic_name, msg_name)
+
+    ans["isValid"] = True
+    if not ans['type'] in ["float32", "float64", "int8", "int16", "int32", "int64"]:
+        ans["isValid"] = False
+    del ans['type']
+    return make_response(jsonify(ans), 200)
+
+
+@app.route("/getAvgOfMsgs", methods=['GET'])
+def getAvgOfMsgs():
+    bagId = request.args.get('id')
+    topic_name = request.args.get('topic_name')
+    msg_name = request.args.get('msg_name')
+    ans = DB.getAvgOfMsgs(defaultCollection, bagId, topic_name, msg_name)
+    
+    ans["isValid"] = True
+    if not ans['type'] in ["float32", "float64", "int8", "int16", "int32", "int64"]:
+        ans["isValid"] = False
+    del ans['type']
+    return make_response(jsonify(ans), 200)
+
+
+@app.route("/getGraph", methods=['GET'])
+def getGraph():
+    bagId = request.args.get('id')
+    topic_name = request.args.get('topic_name')
+    msg_name = request.args.get('msg_name')
+    ans = DB.getMsgsByIdAndTopicNameAndMsgsName(defaultCollection, bagId, topic_name, msg_name)
+
+    output = io.BytesIO()
+    if ans['isNumeric']:
+        fig = Figure(figsize=(9, 6), dpi=80)
+        axis = fig.add_subplot(1, 1, 1)
+        xs = range(len(ans['msgs']))
+        ys = ans['msgs']
+        axis.plot(xs, ys)
+        FigureCanvas(fig).print_png(output)
+    
+    r = Response(output.getvalue(), mimetype='image/png')
+    r.headers['isNumeric'] = ans['isNumeric']
+    return r
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
+    app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
     

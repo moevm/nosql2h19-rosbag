@@ -329,7 +329,6 @@ class dbQueryManager(object):
                 }
             }, {
                 "$project": {
-                    # "msgs_list": "$topics_list.msgs_list",
                     "msgs_list": {
                         "$filter": {
                             "input": "$topics_list",
@@ -344,6 +343,157 @@ class dbQueryManager(object):
         ])
         return self.tmpGetDict(ans)
 
+    def getMsgsByIdAndTopicNameAndMsgsName(self, collection_name, bagId, topic_name, msg_name):
+        collection = self.db[collection_name]
+        ans = collection.aggregate([{
+                "$match": {
+                    "_id": ObjectId(bagId),
+                    "topics_list.topic_name": topic_name
+                }
+            }, {
+                "$project": {
+                    "msgs_list": {
+                        "$filter": {
+                            "input": "$topics_list",
+                            "as": "item",
+                            "cond": { "$eq": ["$$item.topic_name", topic_name] }
+                        }
+                    }
+                }
+            }, {
+                "$unwind": "$msgs_list"
+            },
+            {
+                "$project": {
+                    "msgs": '$msgs_list.msgs_list'
+                }
+            },
+            {
+                "$project": {
+                    "ans": {
+                        "$filter": {
+                            "input": "$msgs",
+                            "as": "item",
+                            "cond": { "$eq": ["$$item.msg_name", msg_name] }
+                        }
+                    }
+                }
+            }, {
+                "$unwind": "$ans"
+            },{
+                "$project": {
+                    "_id": 0,
+                    "type": "$ans.msg_type",
+                    "msgs": "$ans.msgs"
+                }
+            }
+            
+        ])
+        ans = list(ans)[0]
+        ans["isNumeric"] = self.__isNumuricMsgType(ans['type'])
+        del ans['type']
+        return ans
+
+    def getSummOfMsgs(self, collection_name, bagId, topic_name, msg_name):
+        collection = self.db[collection_name]
+        ans = collection.aggregate([{
+                "$match": {
+                    "_id": ObjectId(bagId),
+                    "topics_list.topic_name": topic_name
+                }
+            }, {
+                "$project": {
+                    "msgs_list": {
+                        "$filter": {
+                            "input": "$topics_list",
+                            "as": "item",
+                            "cond": { "$eq": ["$$item.topic_name", topic_name] }
+                        }
+                    }
+                }
+            }, {
+                "$unwind": "$msgs_list"
+            },
+            {
+                "$project": {
+                    "msgs": '$msgs_list.msgs_list'
+                }
+            },
+            {
+                "$project": {
+                    "ans": {
+                        "$filter": {
+                            "input": "$msgs",
+                            "as": "item",
+                            "cond": { "$eq": ["$$item.msg_name", msg_name] }
+                        }
+                    }
+                }
+            }, {
+                "$unwind": "$ans"
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "type": "$ans.msg_type",
+                    "summary": { "$sum": "$ans.msgs"}
+                }
+            },
+        ])
+        return list(ans)[0]
+
+    def getAvgOfMsgs(self, collection_name, bagId, topic_name, msg_name):
+        collection = self.db[collection_name]
+        ans = collection.aggregate([{
+                "$match": {
+                    "_id": ObjectId(bagId),
+                    "topics_list.topic_name": topic_name
+                }
+            }, {
+                "$project": {
+                    "msgs_list": {
+                        "$filter": {
+                            "input": "$topics_list",
+                            "as": "item",
+                            "cond": { "$eq": ["$$item.topic_name", topic_name] }
+                        }
+                    }
+                }
+            }, {
+                "$unwind": "$msgs_list"
+            },
+            {
+                "$project": {
+                    "msgs": '$msgs_list.msgs_list'
+                }
+            },
+            {
+                "$project": {
+                    "ans": {
+                        "$filter": {
+                            "input": "$msgs",
+                            "as": "item",
+                            "cond": { "$eq": ["$$item.msg_name", msg_name] }
+                        }
+                    }
+                }
+            }, {
+                "$unwind": "$ans"
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "type": "$ans.msg_type",
+                    "average": { "$avg": "$ans.msgs"}
+                }
+            },
+        ])
+        return list(ans)[0]
+
+    @staticmethod
+    def __isNumuricMsgType(msg_type):
+        return msg_type in ["float32", "float64", "int8", "int16", "int32", "int64"]
+
     @staticmethod
     def __cursorToMap(iterableOfMaps):
         returned = {}
@@ -351,6 +501,7 @@ class dbQueryManager(object):
             objID = obj.pop("_id")
             returned[objID] = obj
         return returned
+
 
 
 if __name__ == "__main__":
