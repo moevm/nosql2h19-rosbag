@@ -291,9 +291,13 @@ class dbQueryManager(object):
                         "$min": "$date_creation"
                     }
                 }
-        }])
+            }, {
+                "$project": {
+                    "_id": 0
+                }
+            }
+        ])
         ans = list(ans)[0]
-        del ans["_id"]
         return ans
 
     def getMaxMinDurationsByIds(self, collection_name, bagIds):
@@ -315,9 +319,13 @@ class dbQueryManager(object):
                         "$min": "$duration"
                     }
                 }
-        }])
+            }, {
+                "$project": {
+                    "_id": 0
+                }
+            }
+        ])
         ans = list(ans)[0]
-        del ans["_id"]
         return ans
 
     def getMsgsInfoByIdAndTopicName(self, collection_name, bagId, topic_name):
