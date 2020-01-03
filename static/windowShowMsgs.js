@@ -1,8 +1,5 @@
 var WindowShowMsgs = {
     id: "windowShowMsgs",
-    curBagId: "null",
-    curTopicName: "null",
-    curMsgsName: "null",
     view: 'window',
     head: 'Список сообщений',
     modal: true,
@@ -12,6 +9,11 @@ var WindowShowMsgs = {
     position: 'center',
     close: true,
     move: true,
+
+    curBagId: "null",
+    curTopicName: "null",
+    curMsgsName: "null",
+    
     body: {
         view: 'form',
         rows: [{

@@ -4,7 +4,6 @@ var MainTable = {
     "select": true,
     "scrollX": false,
     "fixedRowHeight": false,
-    // "rowHeight": 100,
     "multiselect": false,
     "footer": false,
     "checkboxRefresh": false,

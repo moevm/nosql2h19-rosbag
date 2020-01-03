@@ -46,7 +46,6 @@ class contentManager {
 
         webix.ajax(requestString, requestData, function(result) {
             result = JSON.parse(result)
-            let i = 0
             for (var key in result) {
                 $$(tableID).parse([{
                     id: key,
@@ -55,7 +54,6 @@ class contentManager {
                     topics: result[key]["topics_list"],
                     duration: result[key]["duration"]
                 }])
-                i++
             }
         });
     }
@@ -63,15 +61,17 @@ class contentManager {
     updateTopicsTableByRequest(requestString, requestData){
         $$(`${this.idTopicsTable}`).clearAll()
         const tableID = this.idTopicsTable
+
         
         webix.ajax(requestString, requestData, function(result) {
             result = JSON.parse(result)
-            
+
             for (var key in result) {
+                $$(tableID)["config"]["curBagId"] = key
                 let topicsNumber = result[key]["topic_name"].length
                 for (var i = 0; i < topicsNumber; i++){
                     $$(tableID).add({
-                        id: key + "|_|" + result[key]["topic_name"][i],
+                        id: result[key]["topic_name"][i],
                         topic_name: result[key]["topic_name"][i],
                         msgs_type: result[key]["msgs_type"][i],
                         msgs_num: result[key]["msgs_num"][i],
@@ -87,13 +87,15 @@ class contentManager {
         
         webix.ajax(requestString, requestData, function(result) {
             result = JSON.parse(result)
-            
-            for (var key in result) { // должен быть один   
+            for (var key in result) { // должен быть один
+                $$(tableID)["config"]["curBagId"] = requestData["id"]
+                $$(tableID)["config"]["curTopicName"] = requestData["topic_name"]
+                
                 let msgs = result[key]["msgs_list"]["msgs_list"]
 
                 msgs.forEach(element => {
                     $$(tableID).add({
-                        id: requestData["id"] + "|_|" + requestData["topic_name"] + "|_|" + element['msg_name'],
+                        id: element['msg_name'],
                         msgs_name: element['msg_name'],
                         msgs_type: element['msg_type'],
                     })   
