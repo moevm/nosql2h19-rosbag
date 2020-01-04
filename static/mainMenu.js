@@ -42,7 +42,7 @@ var MainMenu = {
                 webix.ajax("/getFilesNumber", {
                     success: function(result) {
                         result = JSON.parse(result)
-                        $$("labelDownloadWindow").setValue(`Количество файлов для загрузки: ${result['result']}.`)
+                        $$("labelDownloadWindow").setValue(`Количество файлов для загрузки: ${result}.`)
                         $$("windowDownload").show()
                     },
                     error: function(text, data, XmlHttpRequest){
