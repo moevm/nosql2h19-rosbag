@@ -5,6 +5,9 @@ from bson.objectid import ObjectId
 import datetime
 from pprint import pprint
 from adapter import getDataFromBag
+from collections import namedtuple
+
+ReturnedTuple = namedtuple('ReturnedTuple', ["data", "status"])
 
 STORAGE_UPLOAD = "bags/"
 
@@ -159,22 +162,35 @@ class dbQueryManager(object):
             objID = str(obj.pop("_id"))
             returned[objID] = obj
         return returned
+
+    def __newGetList(self, cursor):
+        returnedList = []
+        for doc in cursor:
+            docId = str(doc.pop("_id"))
+            doc["id"] = docId
+            returnedList.append(doc)
+        return returnedList
     
     def getTopicsInfoById(self, collection_name, bagId):
-        collection = self.db[collection_name]
-        ans = collection.aggregate([{
-                "$match": {
-                    "_id": ObjectId(bagId)
+        try:
+            collection = self.db[collection_name]
+            resultCursor = collection.aggregate([{
+                    "$match": {
+                        "_id": ObjectId(bagId)
+                    }
+                }, {
+                    "$project": {
+                        "msgs_num": "$topics_list.msgs_num",
+                        "msgs_type": "$topics_list.msgs_type",
+                        "topic_name":"$topics_list.topic_name",
+                    }
                 }
-            }, {
-                "$project": {
-                    "msgs_num": "$topics_list.msgs_num",
-                    "msgs_type": "$topics_list.msgs_type",
-                    "topic_name":"$topics_list.topic_name",
-                }
-            }
-        ])
-        return self.tmpGetDict(ans)
+            ])
+        except:
+            return ReturnedTuple(data=[], status=False)
+        
+        returnedList = self.__newGetList(resultCursor)
+        return ReturnedTuple(data=returnedList, status=True)
 
     def getTopicsByIds(self, collection_name, bagIds):
         bagIds = map(ObjectId, bagIds)
@@ -247,11 +263,20 @@ class dbQueryManager(object):
         return ans
 
     def getMsgsInfoByIdAndTopicName(self, collection_name, bagId, topic_name):
-        collection = self.db[collection_name]
-        bagId = ObjectId(bagId)
-        queryText = self.__getQueryToGetMsgsByIdAndTopicName(bagId, topic_name)
-        ans = collection.aggregate(queryText)
-        return self.tmpGetDict(ans)
+        try:
+            collection = self.db[collection_name]
+            bagId = ObjectId(bagId)
+            queryText = self.__getQueryToGetMsgsByIdAndTopicName(bagId, topic_name)
+            resultCursor = collection.aggregate(queryText)
+        except:
+            return ReturnedTuple(data=[], status=False)
+        
+        returnedList = self.__newGetList(resultCursor)
+        # Костыль! нужно поправить запрос
+        for document in returnedList:
+            document['msgs_list'] = document['msgs_list']['msgs_list']
+        # /Костыль!
+        return ReturnedTuple(data=returnedList, status=True)
 
     def getMsgsByIdAndTopicNameAndMsgsName(self, collection_name, bagId, topic_name, msg_name):
         collection = self.db[collection_name]

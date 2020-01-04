@@ -62,22 +62,22 @@ class contentManager {
         $$(`${this.idTopicsTable}`).clearAll()
         const tableID = this.idTopicsTable
 
-        
-        webix.ajax(requestString, requestData, function(result) {
-            result = JSON.parse(result)
-
-            for (var key in result) {
-                $$(tableID)["config"]["curBagId"] = key
-                let topicsNumber = result[key]["topic_name"].length
-                for (var i = 0; i < topicsNumber; i++){
+        webix.ajax(requestString, requestData, {
+            success: function(result, data, XmlHttpRequest){
+                result = JSON.parse(result)
+                $$(tableID)["config"]["curBagId"] = result["id"]
+                for (var i = 0; i < result["topic_name"].length; i++){
                     $$(tableID).add({
-                        id: result[key]["topic_name"][i],
-                        topic_name: result[key]["topic_name"][i],
-                        msgs_type: result[key]["msgs_type"][i],
-                        msgs_num: result[key]["msgs_num"][i],
+                        id: result["topic_name"][i],
+                        topic_name: result["topic_name"][i],
+                        msgs_type: result["msgs_type"][i],
+                        msgs_num: result["msgs_num"][i],
                     })
                 }
-            }
+            },
+            error: function(text, data, XmlHttpRequest){
+                webix.alert("Что-то пошло не так!")
+            },
         });
     }
 
@@ -85,22 +85,24 @@ class contentManager {
         $$(`${this.idMsgsTable}`).clearAll()
         const tableID = this.idMsgsTable
         
-        webix.ajax(requestString, requestData, function(result) {
-            result = JSON.parse(result)
-            for (var key in result) { // должен быть один
+        webix.ajax(requestString, requestData, {
+            success: function(result, data, XmlHttpRequest) {
+                result = JSON.parse(result)
+                console.log(result)
                 $$(tableID)["config"]["curBagId"] = requestData["id"]
                 $$(tableID)["config"]["curTopicName"] = requestData["topic_name"]
                 
-                let msgs = result[key]["msgs_list"]["msgs_list"]
-
-                msgs.forEach(element => {
+                result["msgs_list"].forEach(element => {
                     $$(tableID).add({
                         id: element['msg_name'],
                         msgs_name: element['msg_name'],
                         msgs_type: element['msg_type'],
-                    })   
-                });
-            }
+                    })
+                })
+            },
+            error: function(text, data, XmlHttpRequest){
+                webix.alert("Что-то пошло не так!")
+            },
         });
     }
 

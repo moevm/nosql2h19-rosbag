@@ -26,6 +26,7 @@ app.config["defaultCollection"] = "bagfiles_test"
 defaultCollection = app.config["defaultCollection"]
 
 
+
 @app.route("/")
 def hello(name=None):
     return render_template('index.html', name=name)
@@ -76,8 +77,13 @@ def getFilterData():
 @app.route("/getTopicsInfoById", methods=['GET'])
 def getTopicsInfoById():
     bagId = request.args.get('id')
-    ans = DB.getTopicsInfoById(defaultCollection, bagId)
-    return make_response(jsonify(ans), 200)
+    answer = DB.getTopicsInfoById(defaultCollection, bagId)
+    if answer.status:
+        assert len(answer.data) == 1, "Must find only one document!"
+        return make_response(jsonify(answer.data[0]), 200)
+    else:
+        return make_response(jsonify({}), 500)
+
 
 @app.route("/getTopicsByIds", methods=['GET'])
 def getTopicsByIds():
@@ -102,8 +108,13 @@ def getMaxMinDurationsByIds():
 def getMsgsInfoByIdAndTopicName():
     bagId = request.args.get('id')
     topic_name = request.args.get('topic_name')
-    ans = DB.getMsgsInfoByIdAndTopicName(defaultCollection, bagId, topic_name)
-    return make_response(jsonify(ans), 200)
+    answer = DB.getMsgsInfoByIdAndTopicName(defaultCollection, bagId, topic_name)
+
+    if answer.status:
+        assert len(answer.data) == 1, "Must find only one document!"
+        return make_response(jsonify(answer.data[0]), 200)
+    else:
+        return make_response(jsonify({}), 500)
 
 
 @app.route("/getMsgsByIdAndTopicNameAndMsgsName", methods=['GET'])
