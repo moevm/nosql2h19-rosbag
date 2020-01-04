@@ -45,18 +45,17 @@ class contentManager {
         const tableID = this.idMainTable
 
         webix.ajax(requestString, requestData, {
-            success: function(result) {
-                console.log(result)
+            success: function(result, data, XmlHttpRequest) {
                 result = JSON.parse(result)
-                for (var key in result) {
+                result.forEach(element => {
                     $$(tableID).parse([{
-                        id: key,
-                        filename: result[key]["filename"],
-                        creation: result[key]["date_creation"],
-                        topics: result[key]["topics_list"],
-                        duration: result[key]["duration"]
-                    }])
-                }
+                        id: element["id"],
+                        filename: element["filename"],
+                        creation: element["date_creation"],
+                        topics: element["topics_list"],
+                        duration: element["duration"],
+                    }])                    
+                })
             },
             error: function(text, data, XmlHttpRequest){
                 webix.alert("Что-то пошло не так!")
@@ -94,7 +93,6 @@ class contentManager {
         webix.ajax(requestString, requestData, {
             success: function(result, data, XmlHttpRequest) {
                 result = JSON.parse(result)
-                console.log(result)
                 $$(tableID)["config"]["curBagId"] = requestData["id"]
                 $$(tableID)["config"]["curTopicName"] = requestData["topic_name"]
                 
