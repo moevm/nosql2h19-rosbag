@@ -105,14 +105,22 @@ def getTopicNamesForIds():
 @app.route("/getMaxMinDatesByIds", methods=['GET'])
 def getMaxMinDatesByIds():
     bagIds = json.loads(request.args.get('ids'))
-    ans = DB.getMaxMinDatesByIds(defaultCollection, bagIds)
-    return make_response(jsonify(ans), 200)
+    answerFromDB = DB.getMaxMinDatesByIds(defaultCollection, bagIds)
+
+    if answerFromDB.status:
+        return make_response(jsonify(answerFromDB.data), 200)
+    else:
+        return make_response(jsonify({}), 500)
 
 @app.route("/getMaxMinDurationsByIds", methods=['GET'])
 def getMaxMinDurationsByIds():
     bagIds = json.loads(request.args.get('ids'))
-    ans = DB.getMaxMinDurationsByIds(defaultCollection, bagIds)
-    return make_response(jsonify(ans), 200)
+    answerFromDB = DB.getMaxMinDurationsByIds(defaultCollection, bagIds)
+    
+    if answerFromDB.status:
+        return make_response(jsonify(answerFromDB.data), 200)
+    else:
+        return make_response(jsonify({}), 500)
 
 @app.route("/getMsgsInfoByIdAndTopicName", methods=['GET'])
 def getMsgsInfoByIdAndTopicName():

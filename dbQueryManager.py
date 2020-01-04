@@ -179,52 +179,60 @@ class dbQueryManager(object):
         return ReturnedTuple(data=ans, status=True)
 
     def getMaxMinDatesByIds(self, collection_name, bagIds):
-        bagIds = map(ObjectId, bagIds)
-        collection = self.db[collection_name]
-        ans = collection.aggregate([{
-                "$match": {
-                    "_id": {
-                        "$in": bagIds
+        try:
+            bagIds = map(ObjectId, bagIds)
+            collection = self.db[collection_name]
+            resultCursor = collection.aggregate([{
+                    "$match": {
+                        "_id": {
+                            "$in": bagIds
+                        }
+                    }
+                }, {
+                    "$group": {
+                        "_id": "null",
+                        "max": { "$max": "$date_creation" },
+                        "min": { "$min": "$date_creation" }
+                    }
+                }, {
+                    "$project": {
+                        "_id": 0
                     }
                 }
-            }, {
-                "$group": {
-                    "_id": "null",
-                    "max": { "$max": "$date_creation" },
-                    "min": { "$min": "$date_creation" }
-                }
-            }, {
-                "$project": {
-                    "_id": 0
-                }
-            }
-        ])
-        ans = list(ans)[0]
-        return ans
+            ])
+        except:
+            return ReturnedTuple(data=[], status=False)
+        answer = list(resultCursor)
+        assert len(answer) == 1, "Должен быть равен 1!"
+        return ReturnedTuple(data=answer[0], status=True)
 
     def getMaxMinDurationsByIds(self, collection_name, bagIds):
-        bagIds = map(ObjectId, bagIds)
-        collection = self.db[collection_name]
-        ans = collection.aggregate([{
-                "$match": {
-                    "_id": {
-                        "$in": bagIds
+        try:
+            bagIds = map(ObjectId, bagIds)
+            collection = self.db[collection_name]
+            resultCursor = collection.aggregate([{
+                    "$match": {
+                        "_id": {
+                            "$in": bagIds
+                        }
+                    }
+                }, {
+                    "$group": {
+                        "_id": "null",
+                        "max": { "$max": "$duration" },
+                        "min": { "$min": "$duration" }
+                    }
+                }, {
+                    "$project": {
+                        "_id": 0
                     }
                 }
-            }, {
-                "$group": {
-                    "_id": "null",
-                    "max": { "$max": "$duration" },
-                    "min": { "$min": "$duration" }
-                }
-            }, {
-                "$project": {
-                    "_id": 0
-                }
-            }
-        ])
-        ans = list(ans)[0]
-        return ans
+            ])
+        except:
+            return ReturnedTuple(data=[], status=False)
+        answer = list(resultCursor)
+        assert len(answer) == 1, "Должен быть равен 1!"
+        return ReturnedTuple(data=answer[0], status=True)
 
     def getMsgsInfoByIdAndTopicName(self, collection_name, bagId, topic_name):
         try:
