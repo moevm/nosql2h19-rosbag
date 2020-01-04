@@ -44,17 +44,23 @@ class contentManager {
         $$(`${this.idMainTable}`).clearAll()
         const tableID = this.idMainTable
 
-        webix.ajax(requestString, requestData, function(result) {
-            result = JSON.parse(result)
-            for (var key in result) {
-                $$(tableID).parse([{
-                    id: key,
-                    filename: result[key]["filename"],
-                    creation: result[key]["date_creation"],
-                    topics: result[key]["topics_list"],
-                    duration: result[key]["duration"]
-                }])
-            }
+        webix.ajax(requestString, requestData, {
+            success: function(result) {
+                console.log(result)
+                result = JSON.parse(result)
+                for (var key in result) {
+                    $$(tableID).parse([{
+                        id: key,
+                        filename: result[key]["filename"],
+                        creation: result[key]["date_creation"],
+                        topics: result[key]["topics_list"],
+                        duration: result[key]["duration"]
+                    }])
+                }
+            },
+            error: function(text, data, XmlHttpRequest){
+                webix.alert("Что-то пошло не так!")
+            },
         });
     }
 
