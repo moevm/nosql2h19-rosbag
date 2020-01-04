@@ -56,14 +56,6 @@ class dbQueryManager(object):
             return ReturnedTuple(data=[], status=False)
         return ReturnedTuple(data=self.__newGetList(resultCursor), status=True)
 
-    def getSortedBy(self, collection_name, sortedKey):
-        collection = self.db[collection_name]
-        resultCursor = collection.find().sort(
-            [(sortedKey, 1)]
-        )
-        return self.tmpGetDict(resultCursor)
-        # return dbQueryManager.__cursorToMap(resultCursor)
-
     def getBagsByTopics(self, collection_name, bagIds, topics):
         try:
             bagIds = map(ObjectId, bagIds)
