@@ -29,14 +29,17 @@ class dbQueryManager(object):
             newDocument = getDataFromBag(bagname)
             collection = self.db[collection_name]
             collection.insert_one(newDocument)
-        except Exception:
+        except:
             return False
         return True
 
     def getNumberOfDocuments(self, collection_name):
-        collection = self.db[collection_name]
-        result = collection.count({})
-        return result
+        try:
+            collection = self.db[collection_name]
+            result = collection.count({})
+        except:
+            return ReturnedTuple(data=0, status=False)
+        return ReturnedTuple(data=result, status=True)
 
     def getBagInfo(self, collection_name):
         try:

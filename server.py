@@ -32,12 +32,13 @@ def hello(name=None):
     return render_template('index.html', name=name)
 
 @app.route("/getFilesNumber")
+# is not used
 def getFilesNumber():
-    result = DB.getNumberOfDocuments(defaultCollection)
-
-    ans = {'status': True, 'result': result}
-    print(jsonify(ans))
-    return make_response(jsonify(ans), 200)
+    answerFromDB = DB.getNumberOfDocuments(defaultCollection)
+    if answerFromDB.status:
+        return make_response(jsonify(answerFromDB.data), 200)
+    else:
+        return make_response(jsonify({}), 500)
 
 @app.route('/getBagInfo', methods=['GET'])
 def getBagInfo():
