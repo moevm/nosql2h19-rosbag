@@ -39,11 +39,19 @@ class dbQueryManager(object):
         return result
 
     def getBagInfo(self, collection_name):
-        collection = self.db[collection_name]
-        # todo
-        resultCursor = collection.find({}, {"topics_list.msgs_list.msgs" : {"$slice": 10}})
-        return self.tmpGetDict(resultCursor)
-        # return dbQueryManager.__cursorToMap(resultCursor)
+        try:
+            collection = self.db[collection_name]
+            resultCursor = collection.aggregate([{
+                    "$project": {
+                        "filename": 1,
+                        "date_creation": 1,
+                        "duration": 1,
+                    }
+                }
+            ])
+        except:
+            return ReturnedTuple(data=[], status=False)
+        return ReturnedTuple(data=self.__newGetList(resultCursor), status=True)
 
     def getSortedBy(self, collection_name, sortedKey):
         collection = self.db[collection_name]
