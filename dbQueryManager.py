@@ -123,13 +123,6 @@ class dbQueryManager(object):
         return ReturnedTuple(data=self.__newGetList(resultCursor), status=True)
 
 
-    def tmpGetDict(self, iterableOfMaps):
-        returned = {}
-        for obj in iterableOfMaps:
-            objID = str(obj.pop("_id"))
-            returned[objID] = obj
-        return returned
-
     def __newGetList(self, cursor):
         returnedList = []
         for doc in cursor:
