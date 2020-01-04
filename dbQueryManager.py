@@ -251,52 +251,69 @@ class dbQueryManager(object):
         return ReturnedTuple(data=returnedList, status=True)
 
     def getMsgsByIdAndTopicNameAndMsgsName(self, collection_name, bagId, topic_name, msg_name):
-        collection = self.db[collection_name]
-        bagId = ObjectId(bagId)
-        queryText = self.__getQueryToGetMsgsByIdAndTopicNameAndMsgsName(bagId, topic_name, msg_name)
-        queryText += [{
-                "$project": {
-                    "_id": 0,
-                    "type": "$ans.msg_type",
-                    "msgs": "$ans.msgs"
+        try:
+            collection = self.db[collection_name]
+            bagId = ObjectId(bagId)
+            queryText = self.__getQueryToGetMsgsByIdAndTopicNameAndMsgsName(bagId, topic_name, msg_name)
+            queryText += [{
+                    "$project": {
+                        "_id": 0,
+                        "type": "$ans.msg_type",
+                        "msgs": "$ans.msgs"
+                    }
                 }
-            }
-        ]
-        ans = collection.aggregate(queryText)
-        ans = list(ans)[0]
-        ans["isNumeric"] = self.__isNumuricMsgType(ans['type'])
-        del ans['type']
-        return ans
+            ]
+            resultCursor = collection.aggregate(queryText)
+        except:
+            return ReturnedTuple(data=[], status=False)
+        answer = list(resultCursor)
+        assert len(answer) == 1
+        answer = answer[0]
+        answer["isNumeric"] = self.__isNumuricMsgType(answer['type'])
+        del answer['type']
+        return ReturnedTuple(data=answer, status=True)
 
     def getSummOfMsgs(self, collection_name, bagId, topic_name, msg_name):
-        collection = self.db[collection_name]
-        bagId = ObjectId(bagId)
-        queryText = self.__getQueryToGetMsgsByIdAndTopicNameAndMsgsName(bagId, topic_name, msg_name)
-        queryText += [{
-                "$project": {
-                    "_id": 0,
-                    "type": "$ans.msg_type",
-                    "summary": { "$sum": "$ans.msgs"}
-                }
-            },
-        ]
-        ans = collection.aggregate(queryText)
-        return list(ans)[0]
+        try:
+            collection = self.db[collection_name]
+            bagId = ObjectId(bagId)
+            queryText = self.__getQueryToGetMsgsByIdAndTopicNameAndMsgsName(bagId, topic_name, msg_name)
+            queryText += [{
+                    "$project": {
+                        "_id": 0,
+                        "type": "$ans.msg_type",
+                        "summary": { "$sum": "$ans.msgs"}
+                    }
+                },
+            ]
+            resultCursor = collection.aggregate(queryText)
+        except:
+            return ReturnedTuple(data=[], status=False)
+        answer = list(resultCursor)
+        assert len(answer) == 1
+        answer = answer[0]
+        return ReturnedTuple(data=answer, status=True)
 
     def getAvgOfMsgs(self, collection_name, bagId, topic_name, msg_name):
-        collection = self.db[collection_name]
-        bagId = ObjectId(bagId)
-        queryText = self.__getQueryToGetMsgsByIdAndTopicNameAndMsgsName(bagId, topic_name, msg_name)
-        queryText += [{
-                "$project": {
-                    "_id": 0,
-                    "type": "$ans.msg_type",
-                    "average": { "$avg": "$ans.msgs"}
-                }
-            },
-        ]
-        ans = collection.aggregate(queryText)
-        return list(ans)[0]
+        try:
+            collection = self.db[collection_name]
+            bagId = ObjectId(bagId)
+            queryText = self.__getQueryToGetMsgsByIdAndTopicNameAndMsgsName(bagId, topic_name, msg_name)
+            queryText += [{
+                    "$project": {
+                        "_id": 0,
+                        "type": "$ans.msg_type",
+                        "average": { "$avg": "$ans.msgs"}
+                    }
+                },
+            ]
+            resultCursor = collection.aggregate(queryText)
+        except:
+            return ReturnedTuple(data=[], status=False)
+        answer = list(resultCursor)
+        assert len(answer) == 1
+        answer = answer[0]
+        return ReturnedTuple(data=answer, status=True)
 
     def __getQueryToGetMsgsByIdAndTopicName(self, bagObjId, topic_name):
         return [{

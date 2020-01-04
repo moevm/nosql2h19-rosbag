@@ -126,11 +126,11 @@ def getMaxMinDurationsByIds():
 def getMsgsInfoByIdAndTopicName():
     bagId = request.args.get('id')
     topic_name = request.args.get('topic_name')
-    answer = DB.getMsgsInfoByIdAndTopicName(defaultCollection, bagId, topic_name)
+    answerFromDB = DB.getMsgsInfoByIdAndTopicName(defaultCollection, bagId, topic_name)
 
-    if answer.status:
-        assert len(answer.data) == 1, "Must find only one document!"
-        return make_response(jsonify(answer.data[0]), 200)
+    if answerFromDB.status:
+        assert len(answerFromDB.data) == 1, "Must find only one document!"
+        return make_response(jsonify(answerFromDB.data[0]), 200)
     else:
         return make_response(jsonify({}), 500)
 
@@ -140,9 +140,14 @@ def getMsgsByIdAndTopicNameAndMsgsName():
     bagId = request.args.get('id')
     topic_name = request.args.get('topic_name')
     msg_name = request.args.get('msg_name')
-    ans = DB.getMsgsByIdAndTopicNameAndMsgsName(defaultCollection, bagId, topic_name, msg_name)
-    del ans['isNumeric']
-    return make_response(jsonify(ans), 200)
+
+    answerFromDB = DB.getMsgsByIdAndTopicNameAndMsgsName(defaultCollection, bagId, topic_name, msg_name)
+
+    if answerFromDB.status:
+        del answerFromDB.data['isNumeric']
+        return make_response(jsonify(answerFromDB.data), 200)
+    else:
+        return make_response(jsonify({}), 500)
 
 
 @app.route("/getSummOfMsgs", methods=['GET'])
@@ -150,13 +155,16 @@ def getSummOfMsgs():
     bagId = request.args.get('id')
     topic_name = request.args.get('topic_name')
     msg_name = request.args.get('msg_name')
-    ans = DB.getSummOfMsgs(defaultCollection, bagId, topic_name, msg_name)
+    answerFromDB = DB.getSummOfMsgs(defaultCollection, bagId, topic_name, msg_name)
 
-    ans["isValid"] = True
-    if not ans['type'] in ["float32", "float64", "int8", "int16", "int32", "int64"]:
-        ans["isValid"] = False
-    del ans['type']
-    return make_response(jsonify(ans), 200)
+    if answerFromDB.status:
+        answerFromDB.data["isValid"] = True
+        if not answerFromDB.data['type'] in ["float32", "float64", "int8", "int16", "int32", "int64"]:
+            answerFromDB.data["isValid"] = False
+        del answerFromDB.data['type']
+        return make_response(jsonify(answerFromDB.data), 200)
+    else:
+        return make_response(jsonify({}), 500)
 
 
 @app.route("/getAvgOfMsgs", methods=['GET'])
@@ -164,13 +172,16 @@ def getAvgOfMsgs():
     bagId = request.args.get('id')
     topic_name = request.args.get('topic_name')
     msg_name = request.args.get('msg_name')
-    ans = DB.getAvgOfMsgs(defaultCollection, bagId, topic_name, msg_name)
+    answerFromDB = DB.getAvgOfMsgs(defaultCollection, bagId, topic_name, msg_name)
     
-    ans["isValid"] = True
-    if not ans['type'] in ["float32", "float64", "int8", "int16", "int32", "int64"]:
-        ans["isValid"] = False
-    del ans['type']
-    return make_response(jsonify(ans), 200)
+    if answerFromDB.status:
+        answerFromDB.data["isValid"] = True
+        if not answerFromDB.data['type'] in ["float32", "float64", "int8", "int16", "int32", "int64"]:
+            answerFromDB.data["isValid"] = False
+        del answerFromDB.data['type']
+        return make_response(jsonify(answerFromDB.data), 200)
+    else:
+        return make_response(jsonify({}), 500)
 
 
 @app.route("/getGraph", methods=['GET'])
@@ -178,20 +189,23 @@ def getGraph():
     bagId = request.args.get('id')
     topic_name = request.args.get('topic_name')
     msg_name = request.args.get('msg_name')
-    ans = DB.getMsgsByIdAndTopicNameAndMsgsName(defaultCollection, bagId, topic_name, msg_name)
+    answerFromDB = DB.getMsgsByIdAndTopicNameAndMsgsName(defaultCollection, bagId, topic_name, msg_name)
 
-    output = io.BytesIO()
-    if ans['isNumeric']:
-        fig = Figure(figsize=(9, 6), dpi=80)
-        axis = fig.add_subplot(1, 1, 1)
-        xs = range(len(ans['msgs']))
-        ys = ans['msgs']
-        axis.plot(xs, ys)
-        FigureCanvas(fig).print_png(output)
-    
-    r = Response(output.getvalue(), mimetype='image/png')
-    r.headers['isNumeric'] = ans['isNumeric']
-    return r
+    if answerFromDB.status:
+        output = io.BytesIO()
+        if answerFromDB.data['isNumeric']:
+            fig = Figure(figsize=(9, 6), dpi=80)
+            axis = fig.add_subplot(1, 1, 1)
+            xs = range(len(answerFromDB.data['msgs']))
+            ys = answerFromDB.data['msgs']
+            axis.plot(xs, ys)
+            FigureCanvas(fig).print_png(output)
+        
+        r = Response(output.getvalue(), mimetype='image/png')
+        r.headers['isNumeric'] = answerFromDB.data['isNumeric']
+        return r
+    else:
+        return make_response(jsonify({}), 500)
 
 
 
