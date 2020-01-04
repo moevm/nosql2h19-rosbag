@@ -46,19 +46,23 @@ var MsgsTable = {
                 id: id,
                 topic_name: topic_name,
                 msg_name: cur_msg_name,
-            }, function(result) {
-                result = JSON.parse(result)
-                console.log("test!")
-                $$("listOfMsgs").clearAll()
-                result["msgs"].forEach(element => {
-                    $$("listOfMsgs").add({msg: element})         
-                });
+            }, {
+                success: function(result) {
+                    result = JSON.parse(result)
+                    $$("listOfMsgs").clearAll()
+                    result["msgs"].forEach(element => {
+                        $$("listOfMsgs").add({msg: element})         
+                    });
 
-                $$("windowShowMsgs")["config"]["curBagId"] = id;
-                $$("windowShowMsgs")["config"]["curTopicName"] = topic_name;
-                $$("windowShowMsgs")["config"]["curMsgsName"] = cur_msg_name;
+                    $$("windowShowMsgs")["config"]["curBagId"] = id;
+                    $$("windowShowMsgs")["config"]["curTopicName"] = topic_name;
+                    $$("windowShowMsgs")["config"]["curMsgsName"] = cur_msg_name;
+                    $$("windowShowMsgs").show()
+                },
+                error: function(text, data, XmlHttpRequest){
+                    webix.alert("Что-то пошло не так!")
+                }
             })
-            $$("windowShowMsgs").show()
         }
     },
 }

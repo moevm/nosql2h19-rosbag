@@ -39,10 +39,15 @@ var MainMenu = {
             }
             
             if (id == "chooseDownload"){
-                webix.ajax("/getFilesNumber", function(result) {
-                    result = JSON.parse(result)
-                    $$("labelDownloadWindow").setValue(`Количество файлов для загрузки: ${result['result']}.`)
-                    $$("windowDownload").show()
+                webix.ajax("/getFilesNumber", {
+                    success: function(result) {
+                        result = JSON.parse(result)
+                        $$("labelDownloadWindow").setValue(`Количество файлов для загрузки: ${result['result']}.`)
+                        $$("windowDownload").show()
+                    },
+                    error: function(text, data, XmlHttpRequest){
+                        webix.alert("Что-то пошло не так!")
+                    }
                 })
             }
 
@@ -51,17 +56,22 @@ var MainMenu = {
                 
                 webix.ajax("/getMaxMinDatesByIds", {
                     "ids": currentIds
-                }, function(result) {
-                    result = JSON.parse(result)
-                    let minDate = new Date(result['min'])
-                    minDate.setDate(minDate.getDate() - 1)
-                    let maxDate = new Date(result['max'])
-                    maxDate.setDate(maxDate.getDate() + 1)
+                }, {
+                    success: function(result) {
+                        result = JSON.parse(result)
+                        let minDate = new Date(result['min'])
+                        minDate.setDate(minDate.getDate() - 1)
+                        let maxDate = new Date(result['max'])
+                        maxDate.setDate(maxDate.getDate() + 1)
 
-                    $$("dateChooser").getPopup().getBody().define("minDate", minDate);
-                    $$("dateChooser").getPopup().getBody().define("maxDate", maxDate);
+                        $$("dateChooser").getPopup().getBody().define("minDate", minDate);
+                        $$("dateChooser").getPopup().getBody().define("maxDate", maxDate);
 
-                    $$("windowFilterDate").show()
+                        $$("windowFilterDate").show()
+                    },
+                    error: function(text, data, XmlHttpRequest){
+                        webix.alert("Что-то пошло не так!")
+                    }
                 })
             }
 
@@ -70,14 +80,19 @@ var MainMenu = {
 
                 webix.ajax("/getTopicNamesForIds", {
                     "ids": currentIds
-                }, function(result) {
-                    let topicNames = JSON.parse(result)
-                    $$("listOfTopics").clearAll()
-                    topicNames.forEach(topicName => {
-                        $$("listOfTopics").add({title: topicName})
-                    });
+                }, {
+                    success: function(result) {
+                        let topicNames = JSON.parse(result)
+                        $$("listOfTopics").clearAll()
+                        topicNames.forEach(topicName => {
+                            $$("listOfTopics").add({title: topicName})
+                        });
 
-                    $$("windowFilterTopics").show()
+                        $$("windowFilterTopics").show()
+                    },
+                    error: function(text, data, XmlHttpRequest){
+                        webix.alert("Что-то пошло не так!")
+                    }
                 })
             }
 
@@ -86,21 +101,25 @@ var MainMenu = {
                 let currentIds = tableManager.getCurrentIdsFromMainTable()
                 webix.ajax("/getMaxMinDurationsByIds", {
                     "ids": currentIds
-                }, function(result) {
-                    result = JSON.parse(result)
-                    let minDur = Math.round(result['min']) - 1
-                    let maxDur = Math.round(result['max']) + 1
+                }, {
+                    success: function(result) {
+                        result = JSON.parse(result)
+                        let minDur = Math.round(result['min']) - 1
+                        let maxDur = Math.round(result['max']) + 1
 
-                    $$("valueSlider").define("min", minDur)
-                    $$("valueSlider").define("max", maxDur)
-                    $$("valueSlider").define("title", `От ${minDur} до ${maxDur}`)
-                    let avg = Math.floor((maxDur - minDur) / 2)
-                    $$("valueSlider").setValue(avg)
-                    $$("valueOutput").setValue(avg)
-                    
-                    $$("windowFilterDuration").show()
+                        $$("valueSlider").define("min", minDur)
+                        $$("valueSlider").define("max", maxDur)
+                        $$("valueSlider").define("title", `От ${minDur} до ${maxDur}`)
+                        let avg = Math.floor((maxDur - minDur) / 2)
+                        $$("valueSlider").setValue(avg)
+                        $$("valueOutput").setValue(avg)
+                        
+                        $$("windowFilterDuration").show()
+                    },
+                    error: function(text, data, XmlHttpRequest){
+                        webix.alert("Что-то пошло не так!")
+                    }
                 })
-
             }
 
             if (id == "stats") {
