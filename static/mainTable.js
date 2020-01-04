@@ -57,7 +57,7 @@ var MainTable = {
     url: () => {
         return webix.promise(function(resolve) {
             setTimeout(function() {
-                tableManager.updateMainTableByRequest("/getFaceData")
+                tableManager.updateMainTableByRequest("/getBagInfo")
             }, 1000)
         });
     }

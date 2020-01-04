@@ -38,7 +38,7 @@ class dbQueryManager(object):
         result = collection.count({})
         return result
 
-    def getMainInfo(self, collection_name):
+    def getBagInfo(self, collection_name):
         collection = self.db[collection_name]
         # todo
         resultCursor = collection.find({}, {"topics_list.msgs_list.msgs" : {"$slice": 10}})

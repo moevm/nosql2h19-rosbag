@@ -39,9 +39,9 @@ def getFilesNumber():
     print(jsonify(ans))
     return make_response(jsonify(ans), 200)
 
-@app.route('/getFaceData', methods=['GET'])
-def getFaceData():
-    ans = DB.getMainInfo(defaultCollection)
+@app.route('/getBagInfo', methods=['GET'])
+def getBagInfo():
+    ans = DB.getBagInfo(defaultCollection)
     return make_response(jsonify(ans), 200)
 
 

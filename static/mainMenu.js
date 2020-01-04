@@ -118,7 +118,7 @@ var MainMenu = {
                 // todo check this
                 let my_promise = new Promise(function(resolve) {
                     setTimeout(function() {
-                        resolve(tableManager.updateMainTableByRequest("/getFaceData"))
+                        resolve(tableManager.updateMainTableByRequest("/getBagInfo"))
                     }, 1000)
                 });
                 my_promise.then(tableManager.deactivateClearMainMenuItem())
