@@ -123,45 +123,6 @@ class dbQueryManager(object):
         return ReturnedTuple(data=self.__newGetList(resultCursor), status=True)
 
 
-    def getBagsByMsgsNumber(self, collection_name, min_num, max_num):
-        # @outdated
-        collection = self.db[collection_name]
-        resultCursor = collection.aggregate([
-            {
-                "$match": {
-                    "topics_list.msgs_num": {
-                        "$gte": min_num,
-                        "$lte": max_num
-                    }
-                }
-            }
-        ])
-        return dbQueryManager.__cursorToMap(resultCursor)
-
-        collection = self.db[collection_name]
-        all = collection.aggregate([
-            {
-                "$group": {
-                    "_id": "None",
-                    "msgsInTopics": {
-                        "$push": {
-                            "objId": "$_id",
-                            "msgsInTopic": "$topics_list.msgs_num"
-                        }
-                    }
-                }
-            }
-        ])
-        res = dbQueryManager.__cursorToMap(all)["None"]["msgsInTopics"]
-        res = [x["objId"] for x in res if sum(x['msgsInTopic']) > min_num and  sum(x['msgsInTopic']) < max_num]
-
-        ans = collection.find({
-            "_id": {"$in": res}
-        })
-
-        return dbQueryManager.__cursorToMap(ans)
-
-
     def tmpGetDict(self, iterableOfMaps):
         returned = {}
         for obj in iterableOfMaps:
