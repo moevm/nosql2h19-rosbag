@@ -41,8 +41,11 @@ def getFilesNumber():
 
 @app.route('/getBagInfo', methods=['GET'])
 def getBagInfo():
-    ans = DB.getBagInfo(defaultCollection)
-    return make_response(jsonify(ans), 200)
+    answerFromDB = DB.getBagInfo(defaultCollection)
+    if answerFromDB.status:
+        return make_response(jsonify(answerFromDB.data), 200)
+    else:
+        return make_response(jsonify({}), 500)
 
 
 @app.route('/getFilterData', methods=['GET'])
