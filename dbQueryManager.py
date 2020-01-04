@@ -65,67 +65,70 @@ class dbQueryManager(object):
         # return dbQueryManager.__cursorToMap(resultCursor)
 
     def getBagsByTopics(self, collection_name, bagIds, topics):
-        bagIds = map(ObjectId, bagIds)
-        collection = self.db[collection_name]
-        resultCursor = collection.aggregate([
-            {
-                "$match": {
-                    "_id": { "$in": bagIds },
-                    "topics_list.topic_name": {
-                        "$in": topics
+        try:
+            bagIds = map(ObjectId, bagIds)
+            collection = self.db[collection_name]
+            resultCursor = collection.aggregate([
+                {
+                    "$match": {
+                        "_id": { "$in": bagIds },
+                        "topics_list.topic_name": {
+                            "$in": topics
+                        }
                     }
                 }
-            }
-        ])
-        return self.tmpGetDict(resultCursor)
-        # return dbQueryManager.__cursorToMap(resultCursor)
+            ])
+        except:
+            return ReturnedTuple(data=[], status=False)            
+        return ReturnedTuple(data=self.__newGetList(resultCursor), status=True)
 
     def getBagsByDateDistance(self, collection_name, bagIds, date, direction):
-        bagIds = map(ObjectId, bagIds)
         if direction == "more":
             cmper = "$gte"
         if direction == "less":
             cmper = "$lte"
         if direction == "exactly":
             cmper = "$eq"
-        collection = self.db[collection_name]
-        
-        resultCursor = collection.aggregate([{
-                "$match": {
-                    "_id": {
-                        "$in": bagIds
-                    },
-                    "date_creation": {
-                        cmper: date
+        try:
+            bagIds = map(ObjectId, bagIds)
+            collection = self.db[collection_name]
+            resultCursor = collection.aggregate([{
+                    "$match": {
+                        "_id": {
+                            "$in": bagIds
+                        },
+                        "date_creation": {
+                            cmper: date
+                        }
                     }
-                }
-        }])
-        # return dbQueryManager.__cursorToMap(resultCursor)
-        return self.tmpGetDict(resultCursor)
+            }])
+        except:
+            return ReturnedTuple(data=[], status=False)
+        return ReturnedTuple(data=self.__newGetList(resultCursor), status=True)
 
     def getBagsByDuration(self, collection_name, bagIds, duration, direction):
-        bagIds = map(ObjectId, bagIds)
         if direction == "more":
             cmper = "$gte"
         if direction == "less":
             cmper = "$lte"
         if direction == "exactly":
             cmper = "$eq" # todo особый случай. если 24, то между 24 и 25
-        collection = self.db[collection_name]
-        
-        print("Duration:", float(duration))
-        resultCursor = collection.aggregate([{
-                "$match": {
-                    "_id": {
-                        "$in": bagIds
-                    },
-                    "duration": {
-                        cmper: float(duration)
+        try:
+            bagIds = map(ObjectId, bagIds)
+            collection = self.db[collection_name]
+            resultCursor = collection.aggregate([{
+                    "$match": {
+                        "_id": {
+                            "$in": bagIds
+                        },
+                        "duration": {
+                            cmper: float(duration)
+                        }
                     }
-                }
-        }])
-        # return dbQueryManager.__cursorToMap(resultCursor)
-        return self.tmpGetDict(resultCursor)
+            }])
+        except:
+            return ReturnedTuple(data=[], status=False)
+        return ReturnedTuple(data=self.__newGetList(resultCursor), status=True)
 
 
     def getBagsByMsgsNumber(self, collection_name, min_num, max_num):
@@ -203,27 +206,31 @@ class dbQueryManager(object):
         returnedList = self.__newGetList(resultCursor)
         return ReturnedTuple(data=returnedList, status=True)
 
-    def getTopicsByIds(self, collection_name, bagIds):
-        bagIds = map(ObjectId, bagIds)
-        collection = self.db[collection_name]    
-        ans = collection.aggregate([{
-                "$match": {
-                    "_id": { "$in": bagIds }
+    def getTopicNamesForIds(self, collection_name, bagIds):
+        try:
+            bagIds = map(ObjectId, bagIds)
+            collection = self.db[collection_name]    
+            resultCursor = collection.aggregate([{
+                    "$match": {
+                        "_id": { "$in": bagIds }
+                    }
+                }, {
+                    "$project": {
+                        "topic_names": "$topics_list.topic_name",
+                    }
+                },
+                {
+                    "$unwind": "$topic_names"
+                },
+                {
+                    "$group": { "_id": "$topic_names" }
                 }
-            }, {
-                "$project": {
-                    "topic_names": "$topics_list.topic_name",
-                }
-            },
-            {
-                "$unwind": "$topic_names"
-            },
-            {
-                "$group": { "_id": "$topic_names" }
-            }
-        ])
-        ans = [x['_id'] for x in list(ans)]
-        return ans  
+            ])
+        except:
+            return ReturnedTuple(data=[], status=False)
+        
+        ans = [x['_id'] for x in list(resultCursor)]
+        return ReturnedTuple(data=ans, status=True)
 
     def getMaxMinDatesByIds(self, collection_name, bagIds):
         bagIds = map(ObjectId, bagIds)

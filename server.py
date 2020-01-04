@@ -54,7 +54,6 @@ def getFilterData():
     # TODO error "exactly" not working correctly
     filterItem = request.args.get('filterItem')
     bagIds = json.loads(request.args.get('ids'))
-    ans = ""
 
     if not bagIds:
         return make_response(jsonify("No ids to filter"), 200)    
@@ -63,38 +62,45 @@ def getFilterData():
         date = datetime.datetime.strptime(request.args.get('date'), "%Y-%m-%d %X")
         direction = request.args.get('dir')
         if direction in ["exactly", "more", "less"]:
-            ans = DB.getBagsByDateDistance(defaultCollection, bagIds, date, direction)
+            answerFromDB = DB.getBagsByDateDistance(defaultCollection, bagIds, date, direction)
     
     if filterItem == "duration":
         duration = request.args.get('duration')
         direction = request.args.get('dir')
         if direction in ["exactly", "more", "less"]:
-            ans = DB.getBagsByDuration(defaultCollection, bagIds, duration, direction)
+            answerFromDB = DB.getBagsByDuration(defaultCollection, bagIds, duration, direction)
     
     if filterItem == "topics":
         topics = json.loads(request.args.get('topics'))
-        ans = DB.getBagsByTopics(defaultCollection, bagIds, topics)
+        answerFromDB = DB.getBagsByTopics(defaultCollection, bagIds, topics)
     
-    return make_response(jsonify(ans), 200)
+    if answerFromDB.status:
+        return make_response(jsonify(answerFromDB.data), 200)
+    else:
+        return make_response(jsonify({}), 500)
 
 
 @app.route("/getTopicsInfoById", methods=['GET'])
 def getTopicsInfoById():
     bagId = request.args.get('id')
-    answer = DB.getTopicsInfoById(defaultCollection, bagId)
-    if answer.status:
-        assert len(answer.data) == 1, "Must find only one document!"
-        return make_response(jsonify(answer.data[0]), 200)
+    answerFromDB = DB.getTopicsInfoById(defaultCollection, bagId)
+
+    if answerFromDB.status:
+        assert len(answerFromDB.data) == 1, "Must find only one document!"
+        return make_response(jsonify(answerFromDB.data[0]), 200)
     else:
         return make_response(jsonify({}), 500)
 
 
-@app.route("/getTopicsByIds", methods=['GET'])
-def getTopicsByIds():
+@app.route("/getTopicNamesForIds", methods=['GET'])
+def getTopicNamesForIds():
     bagIds = json.loads(request.args.get('ids'))
-    ans = DB.getTopicsByIds(defaultCollection, bagIds)
-    ans = {"topics": ans}
-    return make_response(jsonify(ans), 200)
+    answerFromDB = DB.getTopicNamesForIds(defaultCollection, bagIds)
+
+    if answerFromDB.status:
+        return make_response(jsonify(answerFromDB.data), 200)
+    else:
+        return make_response(jsonify({}), 500)
 
 @app.route("/getMaxMinDatesByIds", methods=['GET'])
 def getMaxMinDatesByIds():

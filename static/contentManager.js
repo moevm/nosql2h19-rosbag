@@ -47,6 +47,7 @@ class contentManager {
         webix.ajax(requestString, requestData, {
             success: function(result, data, XmlHttpRequest) {
                 result = JSON.parse(result)
+                console.log(result)
                 result.forEach(element => {
                     $$(tableID).parse([{
                         id: element["id"],
