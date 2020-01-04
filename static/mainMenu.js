@@ -70,14 +70,19 @@ var MainMenu = {
 
                 webix.ajax("/getTopicNamesForIds", {
                     "ids": currentIds
-                }, function(result) {
-                    let topicNames = JSON.parse(result)
-                    $$("listOfTopics").clearAll()
-                    topicNames.forEach(topicName => {
-                        $$("listOfTopics").add({title: topicName})
-                    });
+                }, {
+                    success: function(result) {
+                        let topicNames = JSON.parse(result)
+                        $$("listOfTopics").clearAll()
+                        topicNames.forEach(topicName => {
+                            $$("listOfTopics").add({title: topicName})
+                        });
 
-                    $$("windowFilterTopics").show()
+                        $$("windowFilterTopics").show()
+                    },
+                    error: function(text, data, XmlHttpRequest){
+                        webix.alert("Что-то пошло не так!")
+                    }
                 })
             }
 
@@ -86,21 +91,25 @@ var MainMenu = {
                 let currentIds = tableManager.getCurrentIdsFromMainTable()
                 webix.ajax("/getMaxMinDurationsByIds", {
                     "ids": currentIds
-                }, function(result) {
-                    result = JSON.parse(result)
-                    let minDur = Math.round(result['min']) - 1
-                    let maxDur = Math.round(result['max']) + 1
+                }, {
+                    success: function(result) {
+                        result = JSON.parse(result)
+                        let minDur = Math.round(result['min']) - 1
+                        let maxDur = Math.round(result['max']) + 1
 
-                    $$("valueSlider").define("min", minDur)
-                    $$("valueSlider").define("max", maxDur)
-                    $$("valueSlider").define("title", `От ${minDur} до ${maxDur}`)
-                    let avg = Math.floor((maxDur - minDur) / 2)
-                    $$("valueSlider").setValue(avg)
-                    $$("valueOutput").setValue(avg)
-                    
-                    $$("windowFilterDuration").show()
+                        $$("valueSlider").define("min", minDur)
+                        $$("valueSlider").define("max", maxDur)
+                        $$("valueSlider").define("title", `От ${minDur} до ${maxDur}`)
+                        let avg = Math.floor((maxDur - minDur) / 2)
+                        $$("valueSlider").setValue(avg)
+                        $$("valueOutput").setValue(avg)
+                        
+                        $$("windowFilterDuration").show()
+                    },
+                    error: function(text, data, XmlHttpRequest){
+                        webix.alert("Что-то пошло не так!")
+                    }
                 })
-
             }
 
             if (id == "stats") {
