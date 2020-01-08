@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-s
-from pymongo import MongoClient
+from __future__ import print_function
+from pymongo import MongoClient, errors
 from bson.objectid import ObjectId  
 import datetime
 from pprint import pprint
@@ -9,20 +10,28 @@ from collections import namedtuple
 
 ReturnedTuple = namedtuple('ReturnedTuple', ["data", "status"])
 
+DATABASE_NAME = "test_database"
+DEFAULT_BAG_COLLECTION = "bagfiles_test"
 STORAGE_UPLOAD = "bags/"
 
 class dbQueryManager(object):
-    def __new__(self, db_name="test_database"):
-        if not hasattr(self, 'instance'):
-            self.instance = super(dbQueryManager, self).__new__(self)
-        return self.instance
-    '''
-    В конструктор передаётся название коллекции и базы данных (опционально).
-    '''
-    def __init__(self, db_name="test_database"):
-        self.client = MongoClient()
-        self.db = self.client[db_name]
-
+    def __new__(self, db_name=DATABASE_NAME):
+        if not hasattr(self, '_instance'):
+            self._instance = super(dbQueryManager, self).__new__(self)
+            try:
+                print("Connection to mongoDB by pymongo client...", end="")
+                self.client = MongoClient()
+                self.db = self.client[db_name]
+                print("%s database connected!" % (db_name))
+            except Exception as e:
+                print("Can not connect with DB!")
+                print("mongo: " + str(e))
+                self.mongo_client = None
+        return self._instance
+    
+    def __init__(self, db_name=DATABASE_NAME):
+        pass
+    
     def addFile(self, collection_name, fileName):
         try:
             bagname = STORAGE_UPLOAD + fileName
