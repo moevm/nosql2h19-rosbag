@@ -4,7 +4,6 @@ var MainTable = {
     "select": true,
     "scrollX": false,
     "fixedRowHeight": false,
-    // "rowHeight": 100,
     "multiselect": false,
     "footer": false,
     "checkboxRefresh": false,
@@ -58,7 +57,7 @@ var MainTable = {
     url: () => {
         return webix.promise(function(resolve) {
             setTimeout(function() {
-                tableManager.updateMainTableByRequest("/getFaceData")
+                tableManager.updateMainTableByRequest("/getBagInfo")
             }, 1000)
         });
     }

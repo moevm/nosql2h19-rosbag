@@ -1,6 +1,6 @@
 var TopicsTable = {
-    "view": "datatable",
     "id": "topicsTable",
+    "view": "datatable",
     "select": true,
     "scrollX": false,
     "fixedRowHeight": false,
@@ -9,6 +9,9 @@ var TopicsTable = {
     "checkboxRefresh": false,
     "width": null,
     "hidden": true,
+
+    // Промежуточные данные запрашиваемогй части файла.
+    "curBagId": null,
 
     "columns": [{
         id: "topic_name",
@@ -40,22 +43,13 @@ var TopicsTable = {
     }],
     onClick: {
         callMsgsBtn: function(event, cell, target) {
-            let data = cell["row"].split("|_|")
-            let id = data[0]
-            let topic_name = data[1]
+            let id = $$("topicsTable")["config"]["curBagId"]
+            let topic_name = cell["row"]
             tableManager.updateMsgsTableByRequest("/getMsgsInfoByIdAndTopicName", {
                 id: id,
                 topic_name: topic_name
             });
             tableManager.showMsgsTable()
-        }
-    },
-    on: {
-        onBeforeLoad: function() {
-            this.showOverlay("Loading...");
-        },
-        onAfterLoad: function() {
-            this.hideOverlay();
         }
     },
 }

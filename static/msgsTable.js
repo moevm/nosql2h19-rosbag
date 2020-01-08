@@ -10,6 +10,10 @@ var MsgsTable = {
     "width": null,
     "hidden": true,
 
+    // Промежуточные данные запрашиваемогй части файла.
+    "curBagId": null,
+    "curTopicName": null,
+
     "columns": [{
         id: "msgs_name",
         "header": "Название",
@@ -34,35 +38,31 @@ var MsgsTable = {
     }],
     onClick: {
         showWindowWithListOfMsgs: function(event, cell, target) {
-            let data = cell["row"].split("|_|")
-            let id = data[0]
-            let topic_name = data[1]
-            let cur_msg_name = data[2]
+            let id = $$("msgsTable")["config"]["curBagId"]
+            let topic_name = $$("msgsTable")["config"]["curTopicName"]
+            let cur_msg_name = cell['row']
 
             webix.ajax("/getMsgsByIdAndTopicNameAndMsgsName", {
                 id: id,
                 topic_name: topic_name,
                 msg_name: cur_msg_name,
-            }, function(result) {
-                result = JSON.parse(result)
-                $$("listOfMsgs").clearAll()
-                result["msgs"].forEach(element => {
-                    $$("listOfMsgs").add({msg: element})         
-                });
+            }, {
+                success: function(result) {
+                    result = JSON.parse(result)
+                    $$("listOfMsgs").clearAll()
+                    result["msgs"].forEach(element => {
+                        $$("listOfMsgs").add({msg: element})         
+                    });
 
-                $$("windowShowMsgs")["config"]["curBagId"] = id;
-                $$("windowShowMsgs")["config"]["curTopicName"] = topic_name;
-                $$("windowShowMsgs")["config"]["curMsgsName"] = cur_msg_name;
+                    $$("windowShowMsgs")["config"]["curBagId"] = id;
+                    $$("windowShowMsgs")["config"]["curTopicName"] = topic_name;
+                    $$("windowShowMsgs")["config"]["curMsgsName"] = cur_msg_name;
+                    $$("windowShowMsgs").show()
+                },
+                error: function(text, data, XmlHttpRequest){
+                    webix.alert("Что-то пошло не так!")
+                }
             })
-            $$("windowShowMsgs").show()
-        }
-    },
-    on: {
-        onBeforeLoad: function() {
-            this.showOverlay("Loading...");
-        },
-        onAfterLoad: function() {
-            this.hideOverlay();
         }
     },
 }

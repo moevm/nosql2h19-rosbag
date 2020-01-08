@@ -44,40 +44,45 @@ class contentManager {
         $$(`${this.idMainTable}`).clearAll()
         const tableID = this.idMainTable
 
-        webix.ajax(requestString, requestData, function(result) {
-            result = JSON.parse(result)
-            let i = 0
-            for (var key in result) {
-                $$(tableID).parse([{
-                    id: key,
-                    filename: result[key]["filename"],
-                    creation: result[key]["date_creation"],
-                    topics: result[key]["topics_list"],
-                    duration: result[key]["duration"]
-                }])
-                i++
-            }
+        webix.ajax(requestString, requestData, {
+            success: function(result, data, XmlHttpRequest) {
+                result = JSON.parse(result)
+                result.forEach(element => {
+                    $$(tableID).parse([{
+                        id: element["id"],
+                        filename: element["filename"],
+                        creation: element["date_creation"],
+                        topics: element["topics_list"],
+                        duration: element["duration"],
+                    }])                    
+                })
+            },
+            error: function(text, data, XmlHttpRequest){
+                webix.alert("Что-то пошло не так!")
+            },
         });
     }
 
     updateTopicsTableByRequest(requestString, requestData){
         $$(`${this.idTopicsTable}`).clearAll()
         const tableID = this.idTopicsTable
-        
-        webix.ajax(requestString, requestData, function(result) {
-            result = JSON.parse(result)
-            
-            for (var key in result) {
-                let topicsNumber = result[key]["topic_name"].length
-                for (var i = 0; i < topicsNumber; i++){
+
+        webix.ajax(requestString, requestData, {
+            success: function(result, data, XmlHttpRequest){
+                result = JSON.parse(result)
+                $$(tableID)["config"]["curBagId"] = result["id"]
+                for (var i = 0; i < result["topic_name"].length; i++){
                     $$(tableID).add({
-                        id: key + "|_|" + result[key]["topic_name"][i],
-                        topic_name: result[key]["topic_name"][i],
-                        msgs_type: result[key]["msgs_type"][i],
-                        msgs_num: result[key]["msgs_num"][i],
+                        id: result["topic_name"][i],
+                        topic_name: result["topic_name"][i],
+                        msgs_type: result["msgs_type"][i],
+                        msgs_num: result["msgs_num"][i],
                     })
                 }
-            }
+            },
+            error: function(text, data, XmlHttpRequest){
+                webix.alert("Что-то пошло не так!")
+            },
         });
     }
 
@@ -85,20 +90,23 @@ class contentManager {
         $$(`${this.idMsgsTable}`).clearAll()
         const tableID = this.idMsgsTable
         
-        webix.ajax(requestString, requestData, function(result) {
-            result = JSON.parse(result)
-            
-            for (var key in result) { // должен быть один   
-                let msgs = result[key]["msgs_list"]["msgs_list"]
-
-                msgs.forEach(element => {
+        webix.ajax(requestString, requestData, {
+            success: function(result, data, XmlHttpRequest) {
+                result = JSON.parse(result)
+                $$(tableID)["config"]["curBagId"] = requestData["id"]
+                $$(tableID)["config"]["curTopicName"] = requestData["topic_name"]
+                
+                result["msgs_list"].forEach(element => {
                     $$(tableID).add({
-                        id: requestData["id"] + "|_|" + requestData["topic_name"] + "|_|" + element['msg_name'],
+                        id: element['msg_name'],
                         msgs_name: element['msg_name'],
                         msgs_type: element['msg_type'],
-                    })   
-                });
-            }
+                    })
+                })
+            },
+            error: function(text, data, XmlHttpRequest){
+                webix.alert("Что-то пошло не так!")
+            },
         });
     }
 
