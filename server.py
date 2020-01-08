@@ -21,8 +21,8 @@ app.register_blueprint(loading_api)
 import dbQueryManager
 DB = dbQueryManager.dbQueryManager()
 
-app.config['UPLOAD_FOLDER'] = dbQueryManager.STORAGE_UPLOAD
-app.config["defaultCollection"] = "bagfiles_test"
+app.config['uploadFolder'] = dbQueryManager.STORAGE_UPLOAD
+app.config["defaultCollection"] = dbQueryManager.DEFAULT_BAG_COLLECTION
 defaultCollection = app.config["defaultCollection"]
 
 

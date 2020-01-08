@@ -19,18 +19,18 @@ def uploadBags():
         file = request.files['upload']
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            file.save(os.path.join(app.config['uploadFolder'], filename))
             status = DB.addFile(app.config["defaultCollection"], filename)
             if status:
                 return make_response(jsonify({"status": "server"}), 200)
             else:
-                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                os.remove(os.path.join(app.config['uploadFolder'], filename))
     return make_response(jsonify({"status": "error"}), 200)
 
 
 @loading_api.route("/download", methods=['GET'])
 def downBags():
-    uploaded = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'])
+    uploaded = os.path.join(app.root_path, app.config['uploadFolder'])
     memory_file = io.BytesIO()
     with zipfile.ZipFile(memory_file, 'w') as zf:
         files = ["Double.bag", "hello.bag", "square.bag"]
