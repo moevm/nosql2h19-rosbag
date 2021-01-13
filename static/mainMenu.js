@@ -59,6 +59,7 @@ var MainMenu = {
                 }, {
                     success: function(result) {
                         result = JSON.parse(result)
+                        console.log(result)
                         let minDate = new Date(result['min'])
                         minDate.setDate(minDate.getDate() - 1)
                         let maxDate = new Date(result['max'])
